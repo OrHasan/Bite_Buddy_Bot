@@ -8,9 +8,10 @@ class DaoController:
         self.db = self.client[db_name]
         self.collection = self.db[collection_name]
 
-    def add_food(self, food_item):
+    def add_food(self, food_item, user_id, date):
         """Adds a new food item to the database."""
-
+        food_item["user_id"] = user_id
+        food_item["date"] = date
         result = self.collection.insert_one(food_item)
         return result.inserted_id
 
