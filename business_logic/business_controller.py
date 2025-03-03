@@ -15,11 +15,14 @@ api_manager=API_Manager()
 dao = DaoController()
 user_state = {}
 
-bot = telebot.TeleBot(bot_secrets.TOKEN)
-user_states = {}
-api_manager=API_Manager()
-dao = DaoController()
-user_state = {}
+def show_reports_categroy(chat_id, message):
+    markup = types.InlineKeyboardMarkup(row_width=2)  # row_width => how many buttons per row
+    button1 = types.InlineKeyboardButton("daily report", callback_data="report_by_date")
+    button2 = types.InlineKeyboardButton("report by categroy", callback_data="reportr_by_categroy")
+    markup.add(button1, button2)
+    bot.send_message(chat_id, message,
+                     reply_markup=markup)
+
 
 def show_menu(chat_id,message):
     markup = types.InlineKeyboardMarkup(row_width=2)  # row_width => how many buttons per row
@@ -31,14 +34,7 @@ def show_menu(chat_id,message):
                      reply_markup=markup)
 
 
-def show_menu(chat_id,message):
-    markup = types.InlineKeyboardMarkup(row_width=2)  # row_width => how many buttons per row
-    button1 = types.InlineKeyboardButton("Add_Food", callback_data="add_food")
-    button2 = types.InlineKeyboardButton("Generate_Report", callback_data="view_stats")
-    button3 = types.InlineKeyboardButton("Show_eaten_food", callback_data="help")
-    markup.add(button1, button2, button3)
-    bot.send_message(chat_id, message,
-                     reply_markup=markup)
+
 
 
 
@@ -53,12 +49,16 @@ def handle_query(call: types.CallbackQuery):
         bot.send_message(call.message.chat.id, "please enter what you have eaten.")
         user_state[call.message.chat.id] = 'waiting_for_food_name'
     elif call.data == "generate_report":
-        bot.send_message(call.message.chat.id, "please enter date.")
-        user_state[call.message.chat.id] = 'waiting_for_date'
+        show_reports_categroy(call.message.chat.id, "click on the desired report")
+
 
     elif call.data == "Show_eaten_food":
         bot.send_message(call.message.chat.id, "please enter the date to see food eaten in that date")
         user_state[call.message.chat.id] = 'show_food_per_date'
+
+    elif call.data == "report_by_date":
+        bot.send_message(call.message.chat.id, "please enter date.")
+        user_state[call.message.chat.id] = 'waiting_for_date'
 
 
 @bot.message_handler(func=lambda message: message.chat.id in user_state and user_state[message.chat.id] == 'waiting_for_food_name')
@@ -155,6 +155,7 @@ def generate_report(message: telebot.types.Message):
                               ", please choice another date")
     else:
         bot.reply_to(message, report)
+    show_menu(message.chat.id,"Choose an option below:")
 
 
 
