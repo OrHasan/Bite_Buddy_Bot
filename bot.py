@@ -22,8 +22,58 @@ def send_welcome(message: telebot.types.Message):
 def generate_report(message: telebot.types.Message):
     logger.info(f"generate report for #{message.chat.id}")
 
-    for food in user_history_db.find():
-        bot.reply_to(message, f"{food['name']}:\n{food['data']}\n")
+    # ToDo: Delete the simulation DB data
+    user_history_db = [{
+        'date': "02.03.25",
+        'name': "Hamburger",
+        'data': {
+            'Calories': 3000,
+            'Healthy': "Yes!!",
+            'Amount': 5
+        }
+    },
+    {
+        'date': "03.03.25",
+        'name': "Pizza",
+        'data': {
+            'Calories': 384.36,
+            'Healthy': "Maybe 😉",
+            'Amount': 12
+        }
+    },
+    {
+        'date': "03.03.25",
+        'name': "air",
+        'data': {
+            'Calories': 9999.99,
+            'Healthy': "NNOOO",
+            'Amount': 240
+        }
+    }]
+
+    last_date = ""
+    report = ""
+    _, *date = message.text.split()
+
+    # ToDo: Return the MongoDB find() function
+    # for food in user_history_db.find():
+    for food in user_history_db:
+        if not date or food['date'] == date[0]:
+            if last_date != food['date']:
+                report += f"\n{food['date']}\n\n"
+                last_date = food['date']
+            report += f"{food['name']}:"
+
+            for data_name, data_info in food['data'].items():
+                report += f"\n{data_name}: {data_info}"
+
+            report += "\n\n"
+
+    if date and not report:
+        bot.reply_to(message, "This date isn't exist in your history or been written in the wrong format"
+                              ", please choice another date")
+    else:
+        bot.reply_to(message, report)
 
 
 @bot.message_handler(func=lambda m: True)
