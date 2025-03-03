@@ -1,8 +1,8 @@
 # 🚧 YOUR BOT NAME HERE
 
 ## The Team
-- 🚧 Participant 1 Name
-- 🚧 Participant 2 Name
+- 🚧 Bayan kassem
+- 🚧 Or Hasan
 - 🚧 Participant 3 Name
 
 ## About this bot

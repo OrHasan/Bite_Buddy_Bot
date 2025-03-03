@@ -18,6 +18,13 @@ def send_welcome(message: telebot.types.Message):
     logger.info(f"+ Start chat #{message.chat.id} from {message.chat.username}")
     bot.reply_to(message, "🤖 Welcome! 🤖")
 
+@bot.message_handler(commands=["report"])
+def generate_report(message: telebot.types.Message):
+    logger.info(f"generate report for #{message.chat.id}")
+
+    for food in user_history_db.find():
+        bot.reply_to(message, f"{food['name']}:\n{food['data']}\n")
+
 
 @bot.message_handler(func=lambda m: True)
 def echo_all(message: telebot.types.Message):
