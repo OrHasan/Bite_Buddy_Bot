@@ -1,25 +1,44 @@
-# 🚧 YOUR BOT NAME HERE
+# Bite Buddy Bot (BBB)
 
 ## The Team
-- 🚧 Bayan kassem
-- 🚧 Or Hasan
-- 🚧 Participant 3 Name
+- Bayan kassem
+- Or Hasan
+- Muhammad Imad
 
 ## About this bot
 
-🚧 ENTER DESCRIPTION HERE
+Bite Buddy Bot (BBB) is a nutrition tracker Telegram bot designed to help users keep track of their daily food intake and generate reports based on their eating habits. The bot allows users to add food items, view their eating history, and generate reports by date or category.
 
-🚧 YOU CAN ADD A t.me LINK TO THE BOT HERE
+https://web.telegram.org/k/#@Bite_Buddy_Bot
 
 🚧 ADD SCREENSHOTS/GIFS/SCREENCAST HERE (REFER TO MARKDOWN'S SYNTAX FOR HELP ON DISPLAYING IMAGES)
-
-🚧 ADD ANY OTHER NOTES REGARDING THE BOT
  
+## About this bot
+
+Add Food: Users can add food items they have eaten, including details such as calories, healthiness, and amount.  
+Generate Reports: Users can generate reports based on specific dates or categories to analyze their eating habits.  
+View Eaten Food: Users can view the food items they have eaten on a specific date.  
+
+## Technologies Used
+
+**Python**: The primary programming language used for the bot.  
+**pyTelegramBotAPI**: A Python wrapper for the Telegram Bot API.  
+**MongoDB**: Used for storing user data and food history.  
+**Google Search Results API**: Used for fetching food information.  
+
+## Usage
+**Start the bot**: Send /start to the bot to see the main menu.  
+**Add Food**: Select "Add_Food" from the menu and enter the food item you have eaten.  
+**Generate Report**: Select "Generate_Report" and choose the type of report you want to generate.  
+**View Eaten Food**: Select "Show_eaten_food" and enter the date to view the food items eaten on that date.  
+
 ## Instructions for Developers 
 ### Prerequisites
 - [uv](https://docs.astral.sh/uv/getting-started/installation/)
 - (uv van install python for you)
-- 🚧 ADD ANY OTHER PREREQUISITE HERE (MONGODB?)
+- MongoDB (PyMongo)
+- Telegram API (pyTelegramBotAPI)
+- Google Search Results API (google-search-results)
 
 ### Setup
 - git clone this repository 
