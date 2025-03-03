@@ -1,10 +1,12 @@
 import logging
 import bot_secrets
 import telebot
+
 from datetime import datetime
 from telebot import types
 from DAO.dao_controller import DaoController
 from business_logic.api_manager import API_Manager
+
 
 
 bot = telebot.TeleBot(bot_secrets.TOKEN)
@@ -13,6 +15,11 @@ api_manager=API_Manager()
 dao = DaoController()
 user_state = {}
 
+bot = telebot.TeleBot(bot_secrets.TOKEN)
+user_states = {}
+api_manager=API_Manager()
+dao = DaoController()
+user_state = {}
 
 def show_menu(chat_id,message):
     markup = types.InlineKeyboardMarkup(row_width=2)  # row_width => how many buttons per row
@@ -22,6 +29,17 @@ def show_menu(chat_id,message):
     markup.add(button1, button2, button3)
     bot.send_message(chat_id, message,
                      reply_markup=markup)
+
+
+def show_menu(chat_id,message):
+    markup = types.InlineKeyboardMarkup(row_width=2)  # row_width => how many buttons per row
+    button1 = types.InlineKeyboardButton("Add_Food", callback_data="add_food")
+    button2 = types.InlineKeyboardButton("Generate_Report", callback_data="view_stats")
+    button3 = types.InlineKeyboardButton("Show_eaten_food", callback_data="help")
+    markup.add(button1, button2, button3)
+    bot.send_message(chat_id, message,
+                     reply_markup=markup)
+
 
 
 @bot.message_handler(commands=["start"])
@@ -37,6 +55,7 @@ def handle_query(call: types.CallbackQuery):
     elif call.data == "generate_report":
         bot.send_message(call.message.chat.id, "please enter date.")
         user_state[call.message.chat.id] = 'waiting_for_date'
+
     elif call.data == "Show_eaten_food":
         bot.send_message(call.message.chat.id, "please enter the date to see food eaten in that date")
         user_state[call.message.chat.id] = 'show_food_per_date'
@@ -72,6 +91,7 @@ def fetch_eaten_food_info(message):
 
     bot.reply_to(message, response)
     user_states.pop(message.chat.id, None)
+
 
 
 @bot.message_handler(func=lambda message: message.chat.id in user_state and user_state[message.chat.id] == 'waiting_for_date')
@@ -135,6 +155,7 @@ def generate_report(message: telebot.types.Message):
                               ", please choice another date")
     else:
         bot.reply_to(message, report)
+
 
 
 @bot.message_handler(func=lambda m: True)
