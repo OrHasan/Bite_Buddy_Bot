@@ -1,5 +1,5 @@
 from pymongo import MongoClient
-
+from datetime import datetime
 
 class DaoController:
 
@@ -8,10 +8,11 @@ class DaoController:
         self.db = self.client[db_name]
         self.collection = self.db[collection_name]
 
-    def add_food(self, food_item, user_id, date):
+    def add_food(self,food_name, food_item, user_id, date):
         """Adds a new food item to the database."""
         food_item["user_id"] = user_id
         food_item["date"] = date
+        food_item["name"] = food_name
         result = self.collection.insert_one(food_item)
         return result.inserted_id
 
@@ -21,7 +22,15 @@ class DaoController:
 
     def get_foods_by_user_and_date(self, user_id, date):
         """Retrieves all foods eaten by a specific user on a specific date."""
-        return list(self.collection.find({"user_id": user_id, "date": date}))
+        start_of_day = datetime(date.year, date.month, date.day)  # start of the given day
+        end_of_day = datetime(date.year, date.month, date.day, 23, 59, 59, 999999)  # end of the given day
+
+        # Query the database
+        result = self.collection.find({
+            "user_id": user_id,
+            "date": {"$gte": start_of_day, "$lte": end_of_day}
+        })
+        return list(result)
 
     def get_all_foods(self):
         """Retrieves all food items."""
