@@ -3,7 +3,9 @@ name = "bothackathon"
 version = "0.1.0"
 requires-python = "~=3.13.0"
 dependencies = [
+    "pymongo>=4.11.1",
     "pytelegrambotapi>=4.26.0",
+    "serpapi>=0.1.5",
 ]
 
 [dependency-groups]
