@@ -10,10 +10,19 @@ class DaoController:
 
     def add_food(self,food_name, food_item, user_id, date):
         """Adds a new food item to the database."""
+        print("dao layer add")
         food_item["user_id"] = user_id
         food_item["date"] = date
+
         food_item["name"] = food_name
-        result = self.collection.insert_one(food_item)
+
+        try:
+            result = self.collection.insert_one(food_item)
+        except Exception as e:
+            # Code to handle the exception
+            print(f"An error occurred: {e}")
+        print(f"add food result {result}")
+
         return result.inserted_id
 
     def get_food(self, name):
