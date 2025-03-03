@@ -28,7 +28,7 @@ def show_menu(chat_id,message):
     markup = types.InlineKeyboardMarkup(row_width=2)  # row_width => how many buttons per row
     button1 = types.InlineKeyboardButton("Add_Food", callback_data="add_food")
     button2 = types.InlineKeyboardButton("Generate_Report", callback_data="generate_report")
-    button3 = types.InlineKeyboardButton("Show_eaten_food", callback_data="help")
+    button3 = types.InlineKeyboardButton("Show_eaten_food", callback_data="Show_eaten_food")
     markup.add(button1, button2, button3)
     bot.send_message(chat_id, message,
                      reply_markup=markup)
@@ -77,7 +77,7 @@ def add_food(message: telebot.types.Message):
         bot.send_message(message.chat.id, "please enter what you have eaten.")
 
 
-@bot.message_handler(func=lambda message: message.chat.id in user_state and user_state[message.chat.id] == 'Show_eaten_food')
+@bot.message_handler(func=lambda message: message.chat.id in user_state and user_state[message.chat.id] == 'show_food_per_date')
 def fetch_eaten_food_info(message):
     """Step 2: Retrieve food information from the database."""
     date = message.text
