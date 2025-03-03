@@ -48,8 +48,8 @@ def handle_query(call: types.CallbackQuery):
 def add_food(message: telebot.types.Message):
     try:
         result=api_manager.get_info_by_api(message.text)
-
-        if message.text=="stam":
+        
+        if result==None:
 
             bot.send_message(message.chat.id, "please enter a valid food")
 
