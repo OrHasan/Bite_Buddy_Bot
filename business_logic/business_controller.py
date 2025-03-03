@@ -11,6 +11,17 @@ bot = telebot.TeleBot(bot_secrets.TOKEN)
 api_manager=API_Manager()
 user_state = {}
 
+
+
+def show_menu(chat_id):
+    markup = types.InlineKeyboardMarkup(row_width=2)  # row_width => how many buttons per row
+    button1 = types.InlineKeyboardButton("Add_Food", callback_data="add_food")
+    button2 = types.InlineKeyboardButton("Generate_Report", callback_data="view_stats")
+    button3 = types.InlineKeyboardButton("Show_eaten_food", callback_data="help")
+    markup.add(button1, button2, button3)
+    bot.send_message(chat_id, "Choose an option below:",
+                     reply_markup=markup)
+
 @bot.message_handler(commands=["start"])
 def send_welcome(message: telebot.types.Message):
     markup = types.InlineKeyboardMarkup(row_width=2)  # row_width => how many buttons per row
@@ -37,7 +48,8 @@ def handle_query(call: types.CallbackQuery):
 def add_food(message: telebot.types.Message):
     try:
         result=api_manager.get_info_by_api(message.text)
-        if result==None:
+
+        if message.text=="stam":
 
             bot.send_message(message.chat.id, "please enter a valid food")
 
@@ -46,8 +58,11 @@ def add_food(message: telebot.types.Message):
             #save in the DB
             bot.reply_to(message, f"added food successfuly : {message.text}")
             user_state[message.chat.id] = None
+            show_menu(message.chat.id)
     except Exception:
         bot.send_message(message.chat.id, "please enter what you have eaten.")
+
+
 
 
 
