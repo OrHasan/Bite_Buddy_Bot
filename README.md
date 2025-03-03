@@ -30,7 +30,7 @@ View Eaten Food: Users can view the food items they have eaten on a specific dat
 **Start the bot**: Send /start to the bot to see the main menu.  
 **Add Food**: Select "Add_Food" from the menu and enter the food item you have eaten.  
 **Generate Report**: Select "Generate_Report" and choose the type of report you want to generate.  
-**View Eaten Food**: Select "Show_eaten_food" and enter the date to view the food items eaten on that date.  
+**View Eaten Food**: Select "Show_eaten_food" and enter the date to view the food items eaten on that date.
 
 ## Instructions for Developers 
 ### Prerequisites
