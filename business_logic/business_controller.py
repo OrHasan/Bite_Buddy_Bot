@@ -9,6 +9,7 @@ from api_manager import API_Manager
 
 bot = telebot.TeleBot(bot_secrets.TOKEN)
 api_manager=API_Manager()
+user_state = {}
 
 @bot.message_handler(commands=["start"])
 def send_welcome(message: telebot.types.Message):
@@ -26,23 +27,25 @@ def send_welcome(message: telebot.types.Message):
 def handle_query(call: types.CallbackQuery):
     if call.data == "add_food":
         bot.send_message(call.message.chat.id, "please enter what you have eaten.")
-        add_food()
+        user_state[call.message.chat.id] = 'waiting_for_food_name'
     elif call.data == "Generate_Report":
         pass
     elif call.data == "Show_eaten_food":
         pass
 
-@bot.message_handler()
+@bot.message_handler(func=lambda message: message.chat.id in user_state and user_state[message.chat.id] == 'waiting_for_food_name')
 def add_food(message: telebot.types.Message):
     try:
         result=api_manager.get_info_by_api(message.text)
         if result==None:
 
             bot.send_message(message.chat.id, "please enter a valid food")
+
         else:
             # Todo
             #save in the DB
             bot.reply_to(message, f"added food successfuly : {message.text}")
+            user_state[message.chat.id] = None
     except Exception:
         bot.send_message(message.chat.id, "please enter what you have eaten.")
 
