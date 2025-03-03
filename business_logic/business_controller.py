@@ -103,11 +103,12 @@ def generate_report(message: telebot.types.Message):
 
     # logger.info(f"generate report for #{message.chat.id}")
     # print(datetime.datetime([:6], tzinfo=datetime.timezone.utc))
-    user_history_db=dao.get_foods_by_user_and_date(message.from_user.id,datetime.now())
+
     last_date = ""
     report = ""
     # _, *date = message.text.split()
     date = message.text
+    user_history_db = dao.get_foods_by_user_and_date(message.from_user.id, datetime.strptime(date, "%d.%m.%y"))
 
 
     # ToDo: Return the MongoDB find() function
@@ -131,7 +132,7 @@ def generate_report(message: telebot.types.Message):
 
     if date and not report:
         bot.reply_to(message, "This date isn't exist in your history or been written in the wrong format"
-                              ", please choice another date")
+                              ", please choose another date")
     else:
         bot.send_message(message.chat.id, report)
     show_menu(message.chat.id,"Choose an option below:")
