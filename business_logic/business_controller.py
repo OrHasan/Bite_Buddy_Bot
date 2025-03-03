@@ -1,4 +1,8 @@
 import logging
+from xmlrpc.client import DateTime
+
+from pyexpat.errors import messages
+
 import bot_secrets
 import telebot
 
@@ -28,7 +32,7 @@ def show_menu(chat_id,message):
     markup = types.InlineKeyboardMarkup(row_width=2)  # row_width => how many buttons per row
     button1 = types.InlineKeyboardButton("Add_Food", callback_data="add_food")
     button2 = types.InlineKeyboardButton("Generate_Report", callback_data="generate_report")
-    button3 = types.InlineKeyboardButton("Show_eaten_food", callback_data="help")
+    button3 = types.InlineKeyboardButton("Show_eaten_food", callback_data="Show_eaten_food")
     markup.add(button1, button2, button3)
     bot.send_message(chat_id, message,
                      reply_markup=markup)
@@ -57,7 +61,7 @@ def handle_query(call: types.CallbackQuery):
         user_state[call.message.chat.id] = 'show_food_per_date'
 
     elif call.data == "report_by_date":
-        bot.send_message(call.message.chat.id, "please enter date.")
+        bot.send_message(call.message.chat.id, "please enter date, in this format dd.mm.yy etc: 03.03.25")
         user_state[call.message.chat.id] = 'waiting_for_date'
 
 
@@ -69,15 +73,15 @@ def add_food(message: telebot.types.Message):
         if result==None:
             bot.send_message(message.chat.id, "please enter a valid food")
         else:
-            dao.add_food(food_item= result, user_id=message.chat.id, date=message.date)
-            bot.reply_to(message, f"added food successfuly : {message.text}")
+            dao.add_food(food_name=message.text,food_item= result, user_id=message.from_user.id, date=datetime.now())
+            bot.send_message(message.chat.id, f"added food successfully : {message.text}")
             user_state[message.chat.id] = None
             show_menu(message.chat.id,"Choose an option below:")
     except Exception:
         bot.send_message(message.chat.id, "please enter what you have eaten.")
 
 
-@bot.message_handler(func=lambda message: message.chat.id in user_state and user_state[message.chat.id] == 'Show_eaten_food')
+@bot.message_handler(func=lambda message: message.chat.id in user_state and user_state[message.chat.id] == 'show_food_per_date')
 def fetch_eaten_food_info(message):
     """Step 2: Retrieve food information from the database."""
     date = message.text
@@ -96,37 +100,10 @@ def fetch_eaten_food_info(message):
 
 @bot.message_handler(func=lambda message: message.chat.id in user_state and user_state[message.chat.id] == 'waiting_for_date')
 def generate_report(message: telebot.types.Message):
+
     # logger.info(f"generate report for #{message.chat.id}")
     # print(datetime.datetime([:6], tzinfo=datetime.timezone.utc))
-    # ToDo: Delete the simulation DB data
-    user_history_db = [{
-        'date': "02.03.25 13:45",
-        'name': "Hamburger",
-        'data': {
-            'Calories': 3000,
-            'Healthy': "Yes!!",
-            'Amount': 5
-        }
-    },
-    {
-        'date': "03.03.25 16:00",
-        'name': "Pizza",
-        'data': {
-            'Calories': 384.36,
-            'Healthy': "Maybe 😉",
-            'Amount': 12
-        }
-    },
-    {
-        'date': "03.03.25 11:43",
-        'name': "air",
-        'data': {
-            'Calories': 9999.99,
-            'Healthy': "NNOOO",
-            'Amount': 240
-        }
-    }]
-
+    user_history_db=dao.get_foods_by_user_and_date(message.from_user.id,datetime.now())
     last_date = ""
     report = ""
     # _, *date = message.text.split()
@@ -136,7 +113,7 @@ def generate_report(message: telebot.types.Message):
     # ToDo: Return the MongoDB find() function
     # for food in user_history_db.find():
     for food in user_history_db:
-        food_date = datetime.strptime(food['date'], "%d.%m.%y %H:%M").strftime("%d.%m.%y")
+        food_date = food['date'].strftime("%d.%m.%y")
 
         # if not date or food_date == date[0]:
         if not date or food_date == date:
@@ -145,7 +122,9 @@ def generate_report(message: telebot.types.Message):
                 last_date = food_date
             report += f"{food['name']}:"
 
-            for data_name, data_info in food['data'].items():
+            for data_name, data_info in food.items():
+                if data_name=="name" or data_name=="date" or data_name=="user_id" or data_name=="_id":
+                    continue
                 report += f"\n{data_name}: {data_info}"
 
             report += "\n\n"
@@ -154,7 +133,7 @@ def generate_report(message: telebot.types.Message):
         bot.reply_to(message, "This date isn't exist in your history or been written in the wrong format"
                               ", please choice another date")
     else:
-        bot.reply_to(message, report)
+        bot.send_message(message.chat.id, report)
     show_menu(message.chat.id,"Choose an option below:")
 
 
