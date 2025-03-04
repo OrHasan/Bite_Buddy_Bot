@@ -196,7 +196,8 @@ def add_food(message: telebot.types.Message):
             dao.save_users_state(users_states)
             show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
     except Exception:
-        bot.send_message(message.chat.id, "an error occured during adding food.")
+        bot.send_message(message.chat.id, "an error occurred during adding food.")
+        show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
 
 
 
@@ -204,41 +205,29 @@ def add_food(message: telebot.types.Message):
 def get_food_info(message: telebot.types.Message):
     try:
         nutrition_info=api_manager.get_info_by_api(message.text)
-        if nutrition_info==None:
+        if nutrition_info== {}:
             logger.warning(f"[user: {message.chat.first_name!r} entered invalid food]")
             bot.send_message(message.chat.id, "please enter a valid food")
         else:
             nutrition_message = (
-                "🍽 **Nutritional Information**:\n"
-                f"🍗 **Protein:** {nutrition_info['protein']}\n"
-                f"🥔 **Carbohydrates:** {nutrition_info['total_carbohydrate']}\n"
-                f"🥑 **Total Fat:** {nutrition_info['total_fat']}\n"
-                f"🧂 **Sodium:** {nutrition_info['sodium']}\n"
-                f"🍌 **Potassium:** {nutrition_info['potassium']}\n"
-                f"🫀 **Cholesterol:** {nutrition_info['cholesterol']}\n"
+                "🍽 Nutritional Information:\n"
+                f"🔥 Calories: {nutrition_info['calories']} kcal\n"
+                f"🍗 Protein: {nutrition_info['protein']}\n"
+                f"🥔 Carbohydrates: {nutrition_info['total_carbohydrate']}\n"
+                f"🥑 Total Fat: {nutrition_info['total_fat']}\n"
+                f"🧂 Sodium: {nutrition_info['sodium']}\n"
+                f"🍌 Potassium: {nutrition_info['potassium']}\n"
+                f"🫀 Cholesterol: {nutrition_info['cholesterol']}\n"
+                f"🍬 Sugars: {nutrition_info['sugars']}\n"
             )
             bot.send_message(message.chat.id, f"{message.text} have:\n {nutrition_message}")
             users_states[message.chat.id] = None
+            show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
     except Exception:
-        bot.send_message(message.chat.id, "an error occured during adding food.")
-    finally:
+        bot.send_message(message.chat.id, "an error occurred during adding food.")
         show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
 
 
-@bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id] == 'show_food_per_date')
-def fetch_eaten_food_info(message):
-    """Step 2: Retrieve food information from the database."""
-    date = message.text
-
-    food_info = dao.get_foods_by_user_and_date(message.chat.id, date)
-
-    if food_info:
-        response = f"🍏 Food: {food_info['name']}\n📌 Category: {food_info['category']}\n🔥 Calories: {food_info['calories']} kcal"
-    else:
-        response = "⚠️ Food not found in the database."
-
-    bot.reply_to(message, response)
-    users_states.pop(message.chat.id, None)
 
 
 @bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id] == 'waiting_for_date')
@@ -300,6 +289,11 @@ def generate_bar_chart(message: telebot.types.Message):
     buffer.close()
     users_states[message.chat.id] = None
 
+@bot.message_handler(func=lambda message: message.chat.id not in users_states or users_states[message.chat.id] is None)
+def handle_random_message(message: telebot.types.Message):
+    # If the user is not in any expected state (i.e., None), send the menu again
+    bot.send_message(message.chat.id, "I didn't quite get that. Please choose one of the options from the menu below:")
+    show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
 
 
 logger.info("> Starting bot")
