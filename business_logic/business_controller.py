@@ -58,7 +58,8 @@ def show_menu(user_id,username,message):
     button1 = types.InlineKeyboardButton("Add_Food", callback_data="add_food")
     button2 = types.InlineKeyboardButton("Generate_Report", callback_data="generate_report")
     button3 = types.InlineKeyboardButton("Show_eaten_food", callback_data="Show_eaten_food")
-    markup.add(button1, button2, button3)
+    button4 = types.InlineKeyboardButton("get_food_info", callback_data="get_food_info")
+    markup.add(button1, button2, button3, button4)
     bot.send_message(user_id, message,
                      reply_markup=markup)
 
@@ -102,7 +103,10 @@ def handle_query(call: types.CallbackQuery):
     elif call.data == "generate_report":
         logger.info(f"[user: {call.message.chat.first_name!r} clicked: generate_report.]")
         show_reports_categroy(call.message.chat.id,call.message.chat.first_name, "click on the desired report")
-
+    elif call.data == "get_food_info":
+        bot.send_message(call.message.chat.id, "please enter a food name to get information about it.")
+        user_state[call.message.chat.id] = 'get_food_info'
+        logger.info(f"[user: {call.message.chat.first_name!r} clicked: get_food_info.]")
     elif call.data == "Show_eaten_food":
         bot.send_message(call.message.chat.id, "please enter the date to see food eaten in that date")
         user_state[call.message.chat.id] = 'show_food_per_date'
@@ -155,6 +159,31 @@ def add_food(message: telebot.types.Message):
         else:
             dao.add_food(food_name=message.text,food_item= result, user_id=message.from_user.id, date=datetime.now())
             bot.send_message(message.chat.id, f"added food successfully : {message.text}")
+            user_state[message.chat.id] = None
+    except Exception:
+        bot.send_message(message.chat.id, "an error occured during adding food.")
+    finally:
+        show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
+
+
+@bot.message_handler(func=lambda message: message.chat.id in user_state and user_state[message.chat.id] == 'get_food_info')
+def get_food_info(message: telebot.types.Message):
+    try:
+        nutrition_info=api_manager.get_info_by_api(message.text)
+        if nutrition_info==None:
+            logger.warning(f"[user: {message.chat.first_name!r} entered invalid food]")
+            bot.send_message(message.chat.id, "please enter a valid food")
+        else:
+            nutrition_message = (
+                "🍽 **Nutritional Information**:\n"
+                f"🍗 **Protein:** {nutrition_info['protein']}\n"
+                f"🥔 **Carbohydrates:** {nutrition_info['total_carbohydrate']}\n"
+                f"🥑 **Total Fat:** {nutrition_info['total_fat']}\n"
+                f"🧂 **Sodium:** {nutrition_info['sodium']}\n"
+                f"🍌 **Potassium:** {nutrition_info['potassium']}\n"
+                f"🫀 **Cholesterol:** {nutrition_info['cholesterol']}\n"
+            )
+            bot.send_message(message.chat.id, f"{message.text} have:\n {nutrition_message}")
             user_state[message.chat.id] = None
     except Exception:
         bot.send_message(message.chat.id, "an error occured during adding food.")

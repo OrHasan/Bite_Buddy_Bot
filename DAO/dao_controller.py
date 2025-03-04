@@ -33,7 +33,7 @@ class DaoController:
         return result.inserted_id
 
     def get_food(self, name):
-        """Retrieves a food item by date."""
+        """Retrieves a food item by name."""
         return self.collection.find_one({"name": name})
 
     def get_foods_by_user_and_date(self, user_id, message):
