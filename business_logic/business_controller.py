@@ -1,20 +1,19 @@
 import logging
-
-
 import bot_secrets
 import telebot
-
 from datetime import datetime
 from telebot import types
 from DAO.dao_controller import DaoController
 from business_logic.Report_Controller import Report_Controller
 from business_logic.api_manager import API_Manager
 
+
 logging.basicConfig(
     format="[%(levelname)s %(asctime)s %(module)s:%(lineno)d] %(message)s",
     level=logging.INFO,
 )
 logger = logging.getLogger(__name__)
+
 bot = telebot.TeleBot(bot_secrets.TOKEN)
 user_states = {}
 api_manager=API_Manager()
@@ -22,8 +21,10 @@ dao = DaoController()
 user_state = {}
 report_controller=Report_Controller()
 
+
 def show_reports_categroy(chat_id,username, message):
     logger.info(f"[showing report categories for user: {username!r}]")
+
     markup = types.InlineKeyboardMarkup(row_width=2)  # row_width => how many buttons per row
     button1 = types.InlineKeyboardButton("daily report", callback_data="report_by_date")
     button2 = types.InlineKeyboardButton("report by categroy", callback_data="reportr_by_categroy")
@@ -31,8 +32,10 @@ def show_reports_categroy(chat_id,username, message):
     bot.send_message(chat_id, message,
                      reply_markup=markup)
 
+
 def show_reports_nutritions(chat_id, username,message):
     logger.info(f"[showing nutritions for user: {username!r}]")
+
     markup = types.InlineKeyboardMarkup(row_width=3)  # row_width => how many buttons per row
     button1 = types.InlineKeyboardButton("fat", callback_data="fat")
     button2 = types.InlineKeyboardButton("cholesterol", callback_data="cholesterol")
@@ -41,13 +44,14 @@ def show_reports_nutritions(chat_id, username,message):
     button5 = types.InlineKeyboardButton("sodium", callback_data="sodium")
     button6 = types.InlineKeyboardButton("potassium", callback_data="potassium")
 
-
     markup.add(button1, button2,button3,button4,button5,button6)
     bot.send_message(chat_id, message,
                      reply_markup=markup)
 
+
 def show_menu(user_id,username,message):
     logger.info(f"[showing menu for user: {username!r}]")
+
     markup = types.InlineKeyboardMarkup(row_width=2)  # row_width => how many buttons per row
     button1 = types.InlineKeyboardButton("Add_Food", callback_data="add_food")
     button2 = types.InlineKeyboardButton("Generate_Report", callback_data="generate_report")
@@ -57,16 +61,9 @@ def show_menu(user_id,username,message):
                      reply_markup=markup)
 
 
-
-
-
-
 @bot.message_handler(commands=["start"])
 def send_welcome(message: telebot.types.Message):
     show_menu(message.chat.id,message.chat.first_name,"Welcome to Bite Buddy, your nutrition tracker! Choose an option below:")
-
-
-
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -78,7 +75,6 @@ def handle_query(call: types.CallbackQuery):
     elif call.data == "generate_report":
         logger.info(f"[user: {call.message.chat.first_name!r} clicked: generate_report.]")
         show_reports_categroy(call.message.chat.id,call.message.chat.first_name, "click on the desired report")
-
 
     elif call.data == "Show_eaten_food":
         bot.send_message(call.message.chat.id, "please enter the date to see food eaten in that date")
@@ -95,7 +91,6 @@ def handle_query(call: types.CallbackQuery):
         logger.info(f"[user: {call.message.chat.first_name!r} clicked: {call.data!r}]")
         bot.send_message(call.message.chat.id, "please enter date, in this format dd.mm.yy etc: 03.03.25")
         user_state[call.message.chat.id] = 'waiting_for_date_for_category_'+call.data
-
 
 
 @bot.message_handler(func=lambda message: message.chat.id in user_state and user_state[message.chat.id] == 'waiting_for_food_name')
@@ -130,7 +125,6 @@ def fetch_eaten_food_info(message):
 
     bot.reply_to(message, response)
     user_states.pop(message.chat.id, None)
-
 
 
 @bot.message_handler(func=lambda message: message.chat.id in user_state and user_state[message.chat.id] == 'waiting_for_date')
@@ -174,7 +168,8 @@ def generate_report_by_category(message: telebot.types.Message):
         show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
 
 
-
 logger.info("> Starting bot")
 bot.infinity_polling()
 logger.info("< terminating bot!")
+
+
