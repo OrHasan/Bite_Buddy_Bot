@@ -27,6 +27,19 @@ def show_reports_categroy(chat_id, message):
     bot.send_message(chat_id, message,
                      reply_markup=markup)
 
+def show_reports_nutritions(chat_id, message):
+    markup = types.InlineKeyboardMarkup(row_width=3)  # row_width => how many buttons per row
+    button1 = types.InlineKeyboardButton("fat", callback_data="total_fat")
+    button2 = types.InlineKeyboardButton("cholesterol", callback_data="cholesterol")
+    button3 = types.InlineKeyboardButton("carbohydrate", callback_data="carbohydrate")
+    button4 = types.InlineKeyboardButton("protein", callback_data="protein")
+    button5 = types.InlineKeyboardButton("sodium", callback_data="sodium")
+    button6 = types.InlineKeyboardButton("potassium", callback_data="potassium")
+
+
+    markup.add(button1, button2,button3,button4,button5,button6)
+    bot.send_message(chat_id, message,
+                     reply_markup=markup)
 
 def show_menu(chat_id,message):
     markup = types.InlineKeyboardMarkup(row_width=2)  # row_width => how many buttons per row
@@ -47,6 +60,9 @@ def send_welcome(message: telebot.types.Message):
     show_menu(message.chat.id,"Welcome to Bite Buddy, your nutrition tracker! Choose an option below:")
 
 
+
+
+
 @bot.callback_query_handler(func=lambda call: True)
 def handle_query(call: types.CallbackQuery):
     if call.data == "add_food":
@@ -63,6 +79,12 @@ def handle_query(call: types.CallbackQuery):
     elif call.data == "report_by_date":
         bot.send_message(call.message.chat.id, "please enter date, in this format dd.mm.yy etc: 03.03.25")
         user_state[call.message.chat.id] = 'waiting_for_date'
+    elif call.data == "reportr_by_categroy":
+        show_reports_nutritions(call.message.chat.id, "click on the desired nutrition")
+    elif call.data == "total_fat" or call.data == "cholesterol" or call.data == "carbohydrate" or call.data == "protein" or call.data == "sodium" or call.data == "potassium":
+        bot.send_message(call.message.chat.id, "please enter date, in this format dd.mm.yy etc: 03.03.25")
+        user_state[call.message.chat.id] = 'waiting_for_date_for_category_'+call.data
+
 
 
 @bot.message_handler(func=lambda message: message.chat.id in user_state and user_state[message.chat.id] == 'waiting_for_food_name')
@@ -99,7 +121,7 @@ def fetch_eaten_food_info(message):
 
 
 @bot.message_handler(func=lambda message: message.chat.id in user_state and user_state[message.chat.id] == 'waiting_for_date')
-def generate_report(message: telebot.types.Message):
+def generate_report_by_date(message: telebot.types.Message):
 
     # logger.info(f"generate report for #{message.chat.id}")
     # print(datetime.datetime([:6], tzinfo=datetime.timezone.utc))
@@ -131,12 +153,50 @@ def generate_report(message: telebot.types.Message):
             report += "\n\n"
 
     if date and not report:
-        bot.reply_to(message, "This date isn't exist in your history or been written in the wrong format"
-                              ", please choose another date")
+
+        bot.reply_to(message, "This date doesn't exist in your history or been written in the wrong format"
+                              ", please choice another date")
+
     else:
         bot.send_message(message.chat.id, report)
     show_menu(message.chat.id,"Choose an option below:")
 
+@bot.message_handler(func=lambda message: message.chat.id in user_state and user_state[message.chat.id] and user_state[message.chat.id].find('waiting_for_date_for_category')!=-1 )
+def generate_report_by_category(message: telebot.types.Message):
+    nutrition=user_state[message.chat.id].split('_')[-1]
+    # logger.info(f"generate report for #{message.chat.id}")
+
+    last_date = ""
+    report = ""
+    date = message.text
+    user_history_db = dao.get_foods_by_user_and_date(message.from_user.id, datetime.strptime(date, "%d.%m.%y"))
+
+
+    # ToDo: Return the MongoDB find() function
+    # for food in user_history_db.find():
+    for food in user_history_db:
+        food_date = food['date'].strftime("%d.%m.%y")
+
+        # if not date or food_date == date[0]:
+        if not date or food_date == date:
+            if last_date != food_date:
+                report += f"\n{food_date}\n\n"
+                last_date = food_date
+            report += f"{food['name']}:"
+
+            for data_name, data_info in food.items():
+                if data_name=="name" or data_name=="date" or data_name=="user_id" or data_name=="_id" or data_name!=nutrition:
+                    continue
+                report += f"\n{data_name}: {data_info}"
+
+            report += "\n\n"
+
+    if date and not report:
+        bot.reply_to(message, "This date doesn't exist in your history or been written in the wrong format"
+                              ", please choice another date")
+    else:
+        bot.send_message(message.chat.id, report)
+    show_menu(message.chat.id,"Choose an option below:")
 
 
 @bot.message_handler(func=lambda m: True)
