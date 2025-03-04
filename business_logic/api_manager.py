@@ -1,6 +1,5 @@
 from pprint import pprint
-# from serpapi import GoogleSearch
-
+import requests
 import logging
 
 logging.basicConfig(
@@ -11,14 +10,41 @@ logger = logging.getLogger(__name__)
 
 
 # TODO - uncomment
-# from bot_secrets import api_key
+from bot_secrets import nutrition_x_api,nutrition_x_app_id
 
 
 class API_Manager:
     def get_info_by_api(self,food_name):
-        logger.info(f"[getting info using the api.]")
+        API_URL = 'https://trackapi.nutritionix.com/v2/natural/nutrients'
+        headers = {
+            'x-app-id': nutrition_x_app_id,  
+            'x-app-key': nutrition_x_api,
+            'Content-Type': 'application/json'
+        }
 
-        # TODO - uncomment
+        data = {
+            "query": food_name
+        }
+
+        response = requests.post(API_URL, headers=headers, json=data)
+        nutritions_dict = {}
+
+        if response.status_code == 200:
+            nutrition_data = response.json()['foods'][0]
+            nutritions_dict['calories'] = str(nutrition_data['nf_calories'])+' gr'
+            nutritions_dict['total_fat'] = str(nutrition_data['nf_total_fat'])+' gr'
+            nutritions_dict['cholesterol'] = str(nutrition_data['nf_cholesterol'])+' gr'
+            nutritions_dict['sodium'] = str(nutrition_data['nf_sodium'])+' gr'
+            nutritions_dict['total_carbohydrate'] = str(nutrition_data['nf_total_carbohydrate'])+' gr'
+            nutritions_dict['potassium'] = str(nutrition_data['nf_potassium'])+' gr'
+            nutritions_dict['protein'] = str(nutrition_data['nf_protein'])+' gr'
+            nutritions_dict['sugars'] = str(nutrition_data['nf_sugars'])+' gr'
+
+        return nutritions_dict
+
+        # logger.info(f"[getting info using the api.]")
+        #
+        # # TODO - uncomment
         # params = {
         #     "q": food_name,
         #     "api_key": api_key
@@ -27,8 +53,4 @@ class API_Manager:
         # results = search.get_dict()
         # nutrition_information = results["knowledge_graph"]['list']
         # return nutrition_information
-        api_result={'total_fat': ['17 g', '26%'], 'cholesterol': ['56 mg', '18%'], 'sodium': ['497 mg', '20%'], 'potassium': ['271 mg', '7%'], 'total_carbohydrate': ['29 g', '9%'], 'protein': ['20 g', '40%']}
-        result={}
-        for i in api_result:
-            result[i]=api_result[i][0]
-        return result
+
