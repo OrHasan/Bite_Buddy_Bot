@@ -109,11 +109,11 @@ def handle_query(call: types.CallbackQuery):
         show_reports_categroy(call.message.chat.id,call.message.chat.first_name, "click on the desired report")
     elif call.data == "get_food_info":
         bot.send_message(call.message.chat.id, "please enter a food name to get information about it.")
-        user_state[call.message.chat.id] = 'get_food_info'
+        users_states[call.message.chat.id] = 'get_food_info'
         logger.info(f"[user: {call.message.chat.first_name!r} clicked: get_food_info.]")
     elif call.data == "Show_eaten_food":
         bot.send_message(call.message.chat.id, "please enter the date to see food eaten in that date")
-        user_state[call.message.chat.id] = 'show_food_per_date'
+        users_states[call.message.chat.id] = 'show_food_per_date'
 
     elif call.data == "report_by_date":
         logger.info(f"[user: {call.message.chat.first_name!r} clicked: report_by_date.]")
@@ -172,7 +172,7 @@ def add_food(message: telebot.types.Message):
         show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
 
 
-@bot.message_handler(func=lambda message: message.chat.id in user_state and user_state[message.chat.id] == 'get_food_info')
+@bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id] == 'get_food_info')
 def get_food_info(message: telebot.types.Message):
     try:
         nutrition_info=api_manager.get_info_by_api(message.text)
@@ -190,14 +190,14 @@ def get_food_info(message: telebot.types.Message):
                 f"🫀 **Cholesterol:** {nutrition_info['cholesterol']}\n"
             )
             bot.send_message(message.chat.id, f"{message.text} have:\n {nutrition_message}")
-            user_state[message.chat.id] = None
+            users_states[message.chat.id] = None
     except Exception:
         bot.send_message(message.chat.id, "an error occured during adding food.")
     finally:
         show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
 
 
-@bot.message_handler(func=lambda message: message.chat.id in user_state and user_state[message.chat.id] == 'show_food_per_date')
+@bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id] == 'show_food_per_date')
 def fetch_eaten_food_info(message):
     """Step 2: Retrieve food information from the database."""
     date = message.text
@@ -210,7 +210,7 @@ def fetch_eaten_food_info(message):
         response = "⚠️ Food not found in the database."
 
     bot.reply_to(message, response)
-    user_states.pop(message.chat.id, None)
+    users_states.pop(message.chat.id, None)
 
 
 @bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id] == 'waiting_for_date')
