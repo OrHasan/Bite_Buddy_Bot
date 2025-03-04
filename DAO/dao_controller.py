@@ -20,7 +20,6 @@ class DaoController:
         logger.info(f"[adding food to the database for the user: {user_id!r}.]")
         food_item["user_id"] = user_id
         food_item["date"] = date
-
         food_item["name"] = food_name
 
         try:
@@ -53,11 +52,6 @@ class DaoController:
             )
             logger.info(f"User state saved/updated/removed for user_id: {user_id}")
 
-    def get_food(self, name):
-        """Retrieves a food item by date."""
-        self.collection = self.db["foods"]
-        return self.collection.find_one({"name": name})
-
     def get_foods_by_user_and_date(self, user_id, message):
         """Retrieves all foods eaten by a specific user on a specific date."""
         self.collection = self.db["foods"]
@@ -73,7 +67,3 @@ class DaoController:
         })
         return list(result)
 
-    def get_all_foods(self):
-        """Retrieves all food items."""
-        self.collection = self.db["foods"]
-        return list(self.collection.find())
