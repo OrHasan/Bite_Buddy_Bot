@@ -158,7 +158,7 @@ def add_food(message: telebot.types.Message):
     try:
         result=api_manager.get_info_by_api(message.text)
 
-        if result==None:
+        if result== {}:
             logger.warning(f"[user: {message.chat.first_name!r} entered invalid food]")
             bot.send_message(message.chat.id, "please enter a valid food")
         else:
@@ -166,10 +166,10 @@ def add_food(message: telebot.types.Message):
             bot.send_message(message.chat.id, f"added food successfully : {message.text}")
             users_states[message.chat.id] = None
             dao.save_users_state(users_states)
+            show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
     except Exception:
         bot.send_message(message.chat.id, "an error occured during adding food.")
-    finally:
-        show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
+
 
 
 @bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id] == 'get_food_info')
