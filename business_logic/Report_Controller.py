@@ -35,7 +35,7 @@ class Report_Controller:
 
                 report += "\n\n"
 
-            return report
+        return report
 
     def generate_report_by_category(self, message, user_history_db, nutritions):
         logger.info(f"[generating category report for user: {message.chat.first_name!r}.]")
