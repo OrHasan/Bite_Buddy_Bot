@@ -32,8 +32,9 @@ class DaoController:
         """Retrieves a food item by date."""
         return self.collection.find_one({"name": name})
 
-    def get_foods_by_user_and_date(self, user_id, date):
+    def get_foods_by_user_and_date(self, user_id, message):
         """Retrieves all foods eaten by a specific user on a specific date."""
+        date = datetime.strptime(message.text, "%d.%m.%y")
         start_of_day = datetime(date.year, date.month, date.day)  # start of the given day
         end_of_day = datetime(date.year, date.month, date.day, 23, 59, 59, 999999)  # end of the given day
 
