@@ -8,6 +8,9 @@ class DaoController:
         self.db = self.client[db_name]
         self.collection = self.db[collection_name]
 
+    def add_food_fake(self,food):
+        result = self.collection.insert_one(food)
+
     def add_food(self,food_name, food_item, user_id, date):
         """Adds a new food item to the database."""
         print("dao layer add")
