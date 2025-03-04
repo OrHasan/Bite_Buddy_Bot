@@ -30,12 +30,12 @@ class API_Manager:
 
         if response.status_code == 200:
             nutrition_data = response.json()['foods'][0]
-            nutritions_dict['calories'] = str(nutrition_data['nf_calories'])+' gr'
+            nutritions_dict['calories'] = str(nutrition_data['nf_calories'])
             nutritions_dict['total_fat'] = str(nutrition_data['nf_total_fat'])+' gr'
-            nutritions_dict['cholesterol'] = str(nutrition_data['nf_cholesterol'])+' gr'
-            nutritions_dict['sodium'] = str(nutrition_data['nf_sodium'])+' gr'
+            nutritions_dict['cholesterol'] = str(nutrition_data['nf_cholesterol'])+' mg'
+            nutritions_dict['sodium'] = str(nutrition_data['nf_sodium'])+' mg'
             nutritions_dict['total_carbohydrate'] = str(nutrition_data['nf_total_carbohydrate'])+' gr'
-            nutritions_dict['potassium'] = str(nutrition_data['nf_potassium'])+' gr'
+            nutritions_dict['potassium'] = str(nutrition_data['nf_potassium'])+' mg'
             nutritions_dict['protein'] = str(nutrition_data['nf_protein'])+' gr'
             nutritions_dict['sugars'] = str(nutrition_data['nf_sugars'])+' gr'
 
