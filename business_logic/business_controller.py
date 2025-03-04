@@ -56,8 +56,7 @@ def show_menu(user_id,username,message):
     markup = types.InlineKeyboardMarkup(row_width=2)  # row_width => how many buttons per row
     button1 = types.InlineKeyboardButton("Add_Food", callback_data="add_food")
     button2 = types.InlineKeyboardButton("Generate_Report", callback_data="generate_report")
-    button3 = types.InlineKeyboardButton("Show_eaten_food", callback_data="Show_eaten_food")
-    markup.add(button1, button2, button3)
+    markup.add(button1, button2)
     bot.send_message(user_id, message,
                      reply_markup=markup)
 
@@ -105,11 +104,6 @@ def handle_query(call: types.CallbackQuery):
     elif call.data == "generate_report":
         logger.info(f"[user: {call.message.chat.first_name!r} clicked: generate_report.]")
         show_reports_categroy(call.message.chat.id,call.message.chat.first_name, "click on the desired report")
-
-    elif call.data == "Show_eaten_food":
-        bot.send_message(call.message.chat.id, "please enter the date to see food eaten in that date")
-        users_states[call.message.chat.id] = 'show_food_per_date'
-        dao.save_users_state(users_states)
 
     elif call.data == "report_by_date":
         logger.info(f"[user: {call.message.chat.first_name!r} clicked: report_by_date.]")
@@ -168,22 +162,6 @@ def add_food(message: telebot.types.Message):
         bot.send_message(message.chat.id, "an error occured during adding food.")
     finally:
         show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
-
-
-@bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id] == 'show_food_per_date')
-def fetch_eaten_food_info(message):
-    """Step 2: Retrieve food information from the database."""
-    date = message.text
-
-    food_info = dao.get_foods_by_user_and_date(message.chat.id, date)
-
-    if food_info:
-        response = f"🍏 Food: {food_info['name']}\n📌 Category: {food_info['category']}\n🔥 Calories: {food_info['calories']} kcal"
-    else:
-        response = "⚠️ Food not found in the database."
-
-    bot.reply_to(message, response)
-    users_states.pop(message.chat.id, None)
 
 
 @bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id] == 'waiting_for_date')
