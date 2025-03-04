@@ -1,11 +1,7 @@
 from pprint import pprint
-
 # from serpapi import GoogleSearch
-
-
 # TODO - uncomment
 # from bot_secrets import api_key
-
 
 
 class API_Manager:
@@ -24,4 +20,3 @@ class API_Manager:
         for i in api_result:
             result[i]=api_result[i][0]
         return result
-
