@@ -17,11 +17,10 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 bot = telebot.TeleBot(bot_secrets.TOKEN)
-user_states = {}
 api_manager=API_Manager()
 dao = DaoController()
-user_state = {}
-user_selections = {}
+users_states = {}
+users_selections = {}
 report_controller=Report_Controller()
 
 
@@ -57,34 +56,36 @@ def show_menu(user_id,username,message):
     markup = types.InlineKeyboardMarkup(row_width=2)  # row_width => how many buttons per row
     button1 = types.InlineKeyboardButton("Add_Food", callback_data="add_food")
     button2 = types.InlineKeyboardButton("Generate_Report", callback_data="generate_report")
-    button3 = types.InlineKeyboardButton("Show_eaten_food", callback_data="Show_eaten_food")
-    markup.add(button1, button2, button3)
+    markup.add(button1, button2)
     bot.send_message(user_id, message,
                      reply_markup=markup)
 
 
 @bot.message_handler(commands=["start"])
 def send_welcome(message: telebot.types.Message):
+    global users_states
+    users_states=dao.get_user_states()
+
     show_menu(message.chat.id,message.chat.first_name,"Welcome to Bite Buddy, your nutrition tracker! Choose an option below:")
 
 
 def update_buttons(call):
     markup = types.InlineKeyboardMarkup(row_width=3)
 
-    button1 = types.InlineKeyboardButton(f"fat {'✅' if 'fat' in user_selections[call.message.chat.id] else '❌'}",
+    button1 = types.InlineKeyboardButton(f"fat {'✅' if 'fat' in users_selections[call.message.chat.id] else '❌'}",
                                          callback_data="fat")
     button2 = types.InlineKeyboardButton(
-        f"cholesterol {'✅' if 'cholesterol' in user_selections[call.message.chat.id] else '❌'}",
+        f"cholesterol {'✅' if 'cholesterol' in users_selections[call.message.chat.id] else '❌'}",
         callback_data="cholesterol")
     button3 = types.InlineKeyboardButton(
-        f"carbohydrate {'✅' if 'carbohydrate' in user_selections[call.message.chat.id] else '❌'}",
+        f"carbohydrate {'✅' if 'carbohydrate' in users_selections[call.message.chat.id] else '❌'}",
         callback_data="carbohydrate")
     button4 = types.InlineKeyboardButton(
-        f"protein {'✅' if 'protein' in user_selections[call.message.chat.id] else '❌'}", callback_data="protein")
+        f"protein {'✅' if 'protein' in users_selections[call.message.chat.id] else '❌'}", callback_data="protein")
     button5 = types.InlineKeyboardButton(
-        f"sodium {'✅' if 'sodium' in user_selections[call.message.chat.id] else '❌'}", callback_data="sodium")
+        f"sodium {'✅' if 'sodium' in users_selections[call.message.chat.id] else '❌'}", callback_data="sodium")
     button6 = types.InlineKeyboardButton(
-        f"potassium {'✅' if 'potassium' in user_selections[call.message.chat.id] else '❌'}",
+        f"potassium {'✅' if 'potassium' in users_selections[call.message.chat.id] else '❌'}",
         callback_data="potassium")
 
     done_button = types.InlineKeyboardButton("Done", callback_data="done_selecting_nutritions_for_report")
@@ -97,32 +98,30 @@ def update_buttons(call):
 def handle_query(call: types.CallbackQuery):
     if call.data == "add_food":
         bot.send_message(call.message.chat.id, "please enter what you have eaten.")
-        user_state[call.message.chat.id] = 'waiting_for_food_name'
+        users_states[call.message.chat.id] = 'waiting_for_food_name'
+        dao.save_users_state(users_states)
         logger.info(f"[user: {call.message.chat.first_name!r} clicked: add_food.]")
     elif call.data == "generate_report":
         logger.info(f"[user: {call.message.chat.first_name!r} clicked: generate_report.]")
         show_reports_categroy(call.message.chat.id,call.message.chat.first_name, "click on the desired report")
 
-    elif call.data == "Show_eaten_food":
-        bot.send_message(call.message.chat.id, "please enter the date to see food eaten in that date")
-        user_state[call.message.chat.id] = 'show_food_per_date'
-
     elif call.data == "report_by_date":
         logger.info(f"[user: {call.message.chat.first_name!r} clicked: report_by_date.]")
         bot.send_message(call.message.chat.id, "please enter date, in this format dd.mm.yy etc: 03.03.25")
-        user_state[call.message.chat.id] = 'waiting_for_date'
+        users_states[call.message.chat.id] = 'waiting_for_date'
+        dao.save_users_state(users_states)
     elif call.data == "reportr_by_categroy":
         logger.info(f"[user: {call.message.chat.first_name!r} clicked: reportr_by_categroy.]")
         show_reports_nutritions(call.message.chat.id,call.message.chat.first_name, "Please select the desired nutritions. Click 'Done' when finished.")
     elif call.data == "fat" or call.data == "cholesterol" or call.data == "carbohydrate" or call.data == "protein" or call.data == "sodium" or call.data == "potassium":
         logger.info(f"[user: {call.message.chat.first_name!r} clicked: {call.data!r}]")
-        if call.message.chat.id not in user_selections:
-            user_selections[call.message.chat.id] = []
+        if call.message.chat.id not in users_selections:
+            users_selections[call.message.chat.id] = []
         # toggle the selection for the clicked category
-        if call.data not in user_selections[call.message.chat.id]:
-            user_selections[call.message.chat.id].append(call.data)
+        if call.data not in users_selections[call.message.chat.id]:
+            users_selections[call.message.chat.id].append(call.data)
         else:
-            user_selections[call.message.chat.id].remove(call.data)
+            users_selections[call.message.chat.id].remove(call.data)
 
         markup=update_buttons(call)
 
@@ -135,16 +134,18 @@ def handle_query(call: types.CallbackQuery):
         )
 
     elif call.data == "done_selecting_nutritions_for_report":
-        if call.message.chat.id not in user_selections or not user_selections[call.message.chat.id]:
+        if call.message.chat.id not in users_selections or not users_selections[call.message.chat.id]:
             bot.send_message(call.message.chat.id, "No selection made, please select at least 1 nutrition")
 
         else:
             bot.send_message(call.message.chat.id, "please enter date, in this format dd.mm.yy etc: 03.03.25")
-            user_state[call.message.chat.id] = 'waiting_for_date_for_category'
+            users_states[call.message.chat.id] = 'waiting_for_date_for_category'
+            dao.save_users_state(users_states)
 
 
 
-@bot.message_handler(func=lambda message: message.chat.id in user_state and user_state[message.chat.id] == 'waiting_for_food_name')
+
+@bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id] == 'waiting_for_food_name')
 def add_food(message: telebot.types.Message):
     try:
         result=api_manager.get_info_by_api(message.text)
@@ -155,30 +156,15 @@ def add_food(message: telebot.types.Message):
         else:
             dao.add_food(food_name=message.text,food_item= result, user_id=message.from_user.id, date=datetime.now())
             bot.send_message(message.chat.id, f"added food successfully : {message.text}")
-            user_state[message.chat.id] = None
+            users_states[message.chat.id] = None
+            dao.save_users_state(users_states)
     except Exception:
         bot.send_message(message.chat.id, "an error occured during adding food.")
     finally:
         show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
 
 
-@bot.message_handler(func=lambda message: message.chat.id in user_state and user_state[message.chat.id] == 'show_food_per_date')
-def fetch_eaten_food_info(message):
-    """Step 2: Retrieve food information from the database."""
-    date = message.text
-
-    food_info = dao.get_foods_by_user_and_date(message.chat.id, date)
-
-    if food_info:
-        response = f"🍏 Food: {food_info['name']}\n📌 Category: {food_info['category']}\n🔥 Calories: {food_info['calories']} kcal"
-    else:
-        response = "⚠️ Food not found in the database."
-
-    bot.reply_to(message, response)
-    user_states.pop(message.chat.id, None)
-
-
-@bot.message_handler(func=lambda message: message.chat.id in user_state and user_state[message.chat.id] == 'waiting_for_date')
+@bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id] == 'waiting_for_date')
 def generate_report_by_date(message: telebot.types.Message):
     try:
         datetime.strptime(message.text, "%d.%m.%y") #checks if the date is in the correct format
@@ -188,21 +174,21 @@ def generate_report_by_date(message: telebot.types.Message):
             bot.send_message(message.chat.id, "there is no data for the given date.")
         else:
             bot.send_message(message.chat.id, report)
+        users_states[message.chat.id] = None
+        dao.save_users_state(users_states)
+        show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
 
     except ValueError:
         logger.warning(f"[user: {message.chat.first_name!r} entered wrong date format]")
         bot.reply_to(message, "the given date is in a wrong format, please enter in this format : dd.mm.yy")
 
-    finally:
-        user_state[message.chat.id] = None
-        show_menu(message.chat.id,message.chat.first_name, "Choose an option below:")
 
 
-@bot.message_handler(func=lambda message: message.chat.id in user_state and user_state[message.chat.id] and user_state[message.chat.id]=="waiting_for_date_for_category")
+@bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id] and users_states[message.chat.id] == "waiting_for_date_for_category")
 def generate_report_by_category(message: telebot.types.Message):
     try:
 
-        nutritions =user_selections[message.chat.id]
+        nutritions =users_selections[message.chat.id]
         datetime.strptime(message.text, "%d.%m.%y")  # checks if the date is in the correct format
         user_history_db = dao.get_foods_by_user_and_date(message.from_user.id, message)
         report = report_controller.generate_report_by_category(message, user_history_db,nutritions)
@@ -210,8 +196,9 @@ def generate_report_by_category(message: telebot.types.Message):
             bot.send_message(message.chat.id, "there is no data for the given date.")
         else:
             bot.send_message(message.chat.id, report)
-        user_state[message.chat.id] = None
-        user_selections[message.chat.id] = []
+        users_states[message.chat.id] = None
+        users_selections[message.chat.id] = []
+        dao.save_users_state(users_states)
         show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
 
     except ValueError:
