@@ -197,6 +197,7 @@ def add_food(message: telebot.types.Message):
             show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
     except Exception:
         bot.send_message(message.chat.id, "an error occurred during adding food.")
+        show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
 
 
 
@@ -221,7 +222,8 @@ def get_food_info(message: telebot.types.Message):
             users_states[message.chat.id] = None
             show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
     except Exception:
-        bot.send_message(message.chat.id, "an error occured during adding food.")
+        bot.send_message(message.chat.id, "an error occurred during adding food.")
+        show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
 
 
 
