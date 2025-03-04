@@ -9,7 +9,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-# TODO - uncomment
 from bot_secrets import nutrition_x_api,nutrition_x_app_id
 
 
@@ -17,7 +16,7 @@ class API_Manager:
     def get_info_by_api(self,food_name):
         API_URL = 'https://trackapi.nutritionix.com/v2/natural/nutrients'
         headers = {
-            'x-app-id': nutrition_x_app_id,  
+            'x-app-id': nutrition_x_app_id,
             'x-app-key': nutrition_x_api,
             'Content-Type': 'application/json'
         }
@@ -39,6 +38,7 @@ class API_Manager:
             nutritions_dict['potassium'] = str(nutrition_data['nf_potassium'])+' gr'
             nutritions_dict['protein'] = str(nutrition_data['nf_protein'])+' gr'
             nutritions_dict['sugars'] = str(nutrition_data['nf_sugars'])+' gr'
+
 
         return nutritions_dict
 
