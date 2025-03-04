@@ -38,10 +38,7 @@ def show_reports_categroy(chat_id,username, message):
 
 def show_reports_nutritions(chat_id, username,message):
     logger.info(f"[showing nutritions for user: {username!r}]")
-    # Create the inline keyboard
     markup = types.InlineKeyboardMarkup(row_width=3)
-
-    # Nutrition options with initial states
     button1 = types.InlineKeyboardButton("fat ❌", callback_data="fat")
     button2 = types.InlineKeyboardButton("cholesterol ❌", callback_data="cholesterol")
     button3 = types.InlineKeyboardButton("carbohydrate ❌", callback_data="carbohydrate")
@@ -49,22 +46,9 @@ def show_reports_nutritions(chat_id, username,message):
     button5 = types.InlineKeyboardButton("sodium ❌", callback_data="sodium")
     button6 = types.InlineKeyboardButton("potassium ❌", callback_data="potassium")
     done_button = types.InlineKeyboardButton("Done", callback_data="done_selecting_nutritions_for_report")
-
     markup.add(button1, button2, button3, button4, button5, button6, done_button)
-
-    # Send message with nutrition options
     bot.send_message(chat_id, message, reply_markup=markup)
-    # markup = types.InlineKeyboardMarkup(row_width=3)  # row_width => how many buttons per row
-    # button1 = types.InlineKeyboardButton("fat", callback_data="fat")
-    # button2 = types.InlineKeyboardButton("cholesterol", callback_data="cholesterol")
-    # button3 = types.InlineKeyboardButton("carbohydrate", callback_data="carbohydrate")
-    # button4 = types.InlineKeyboardButton("protein", callback_data="protein")
-    # button5 = types.InlineKeyboardButton("sodium", callback_data="sodium")
-    # button6 = types.InlineKeyboardButton("potassium", callback_data="potassium")
-    #
-    # markup.add(button1, button2,button3,button4,button5,button6)
-    # bot.send_message(chat_id, message,
-    #                  reply_markup=markup)
+
 
 
 def show_menu(user_id,username,message):
@@ -143,7 +127,6 @@ def handle_query(call: types.CallbackQuery):
         markup=update_buttons(call)
 
 
-        # Edit the message with updated buttons
         bot.edit_message_text(
             chat_id=call.message.chat.id,
             message_id=call.message.message_id,
