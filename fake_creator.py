@@ -32,4 +32,4 @@ for food in list_of_foods:
     timestamp_format = "%Y-%m-%dT%H:%M:%S.%f+00:00"
     datetime_obj = datetime.strptime(food['date'], timestamp_format)
     food['date']=datetime_obj
-    dao_controller.add_food_fake(food)
+    dao_controller.add_fake(food)
