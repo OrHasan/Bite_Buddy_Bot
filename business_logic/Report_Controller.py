@@ -1,7 +1,17 @@
+import logging
+
+logging.basicConfig(
+    format="[%(levelname)s %(asctime)s %(module)s:%(lineno)d] %(message)s",
+    level=logging.INFO,
+)
+logger = logging.getLogger(__name__)
+
 class Report_Controller:
     def generate_report_by_date(self, message,user_history_db):
         # logger.info(f"generate report for #{message.chat.id}")
+        logger.info(f"[generating daily report for user: {message.chat.first_name!r}.]")
         date=message.text
+
 
         last_date = ""
         report = ""
@@ -28,6 +38,7 @@ class Report_Controller:
             return report
 
     def generate_report_by_category(self, message, user_history_db, nutrition):
+        logger.info(f"[generating category report for user: {message.chat.first_name!r}.]")
         last_date = ""
         report = ""
         date = message.text

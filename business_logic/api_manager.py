@@ -1,6 +1,13 @@
 from pprint import pprint
 
 # from serpapi import GoogleSearch
+import logging
+
+logging.basicConfig(
+    format="[%(levelname)s %(asctime)s %(module)s:%(lineno)d] %(message)s",
+    level=logging.INFO,
+)
+logger = logging.getLogger(__name__)
 
 
 # TODO - uncomment
@@ -10,6 +17,8 @@ from pprint import pprint
 
 class API_Manager:
     def get_info_by_api(self,food_name):
+        logger.info(f"[getting info using the api.]")
+
         # TODO - uncomment
         # params = {
         #     "q": food_name,
