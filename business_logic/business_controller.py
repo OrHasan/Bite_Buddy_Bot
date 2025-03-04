@@ -8,6 +8,7 @@ from telebot import types
 from DAO.dao_controller import DaoController
 from business_logic.Report_Controller import Report_Controller
 from business_logic.api_manager import API_Manager
+from business_logic.graph_controller import Graph_Controller
 
 
 logging.basicConfig(
@@ -29,10 +30,9 @@ def show_reports_categroy(chat_id,username, message):
 
     markup = types.InlineKeyboardMarkup(row_width=2)  # row_width => how many buttons per row
     button1 = types.InlineKeyboardButton("daily report", callback_data="report_by_date")
-    button2 = types.InlineKeyboardButton("report by categroy", callback_data="reportr_by_categroy")
+    button2 = types.InlineKeyboardButton("report by category", callback_data="report_by_category")
     markup.add(button1, button2)
-    bot.send_message(chat_id, message,
-                     reply_markup=markup)
+    bot.send_message(chat_id, message, reply_markup=markup)
 
 
 def show_reports_nutritions(chat_id, username,message):
@@ -49,6 +49,15 @@ def show_reports_nutritions(chat_id, username,message):
     bot.send_message(chat_id, message, reply_markup=markup)
 
 
+def show_charts_categroy(chat_id,username, message):
+    logger.info(f"[showing chart report categories for user: {username!r}]")
+
+    markup = types.InlineKeyboardMarkup(row_width=2)  # row_width => how many buttons per row
+    button1 = types.InlineKeyboardButton("Pie-Chart", callback_data="pie_chart_report")
+    button2 = types.InlineKeyboardButton("Bar-Chart", callback_data="bar_chart_report")
+    markup.add(button1, button2)
+    bot.send_message(chat_id, message, reply_markup=markup)
+
 
 def show_menu(user_id,username,message):
     logger.info(f"[showing menu for user: {username!r}]")
@@ -56,9 +65,9 @@ def show_menu(user_id,username,message):
     markup = types.InlineKeyboardMarkup(row_width=2)  # row_width => how many buttons per row
     button1 = types.InlineKeyboardButton("Add_Food", callback_data="add_food")
     button2 = types.InlineKeyboardButton("Generate_Report", callback_data="generate_report")
-    markup.add(button1, button2)
-    bot.send_message(user_id, message,
-                     reply_markup=markup)
+    button3 = types.InlineKeyboardButton("Chart Report", callback_data="chart_report")
+    markup.add(button1, button2, button3)
+    bot.send_message(user_id, message, reply_markup=markup)
 
 
 @bot.message_handler(commands=["start"])
@@ -101,22 +110,42 @@ def handle_query(call: types.CallbackQuery):
         users_states[call.message.chat.id] = 'waiting_for_food_name'
         dao.save_users_state(users_states)
         logger.info(f"[user: {call.message.chat.first_name!r} clicked: add_food.]")
+
     elif call.data == "generate_report":
         logger.info(f"[user: {call.message.chat.first_name!r} clicked: generate_report.]")
-        show_reports_categroy(call.message.chat.id,call.message.chat.first_name, "click on the desired report")
+        show_reports_categroy(call.message.chat.id, call.message.chat.first_name, "click on the desired report")
 
     elif call.data == "report_by_date":
         logger.info(f"[user: {call.message.chat.first_name!r} clicked: report_by_date.]")
         bot.send_message(call.message.chat.id, "please enter date, in this format dd.mm.yy etc: 03.03.25")
         users_states[call.message.chat.id] = 'waiting_for_date'
         dao.save_users_state(users_states)
-    elif call.data == "reportr_by_categroy":
-        logger.info(f"[user: {call.message.chat.first_name!r} clicked: reportr_by_categroy.]")
-        show_reports_nutritions(call.message.chat.id,call.message.chat.first_name, "Please select the desired nutritions. Click 'Done' when finished.")
+
+    elif call.data == "report_by_category":
+        logger.info(f"[user: {call.message.chat.first_name!r} clicked: report_by_category.]")
+        show_reports_nutritions(call.message.chat.id, call.message.chat.first_name, "Please select the desired nutritions. Click 'Done' when finished.")
+
+    elif call.data == "chart_report":
+        logger.info(f"[user: {call.message.chat.first_name!r} clicked: chart_report.]")
+        show_charts_categroy(call.message.chat.id, call.message.chat.first_name, "Please select the chart type")
+
+    elif call.data == "pie_chart_report":
+        logger.info(f"[user: {call.message.chat.first_name!r} clicked: pie_chart_report.]")
+        bot.send_message(call.message.chat.id, "please enter date, in this format dd.mm.yy etc: 03.03.25")
+        users_states[call.message.chat.id] = 'waiting_for_pie_chart_data'
+        dao.save_users_state(users_states)
+
+    elif call.data == "bar_chart_report":
+        logger.info(f"[user: {call.message.chat.first_name!r} clicked: bar_chart_report.]")
+        bot.send_message(call.message.chat.id, "please enter date, in this format dd.mm.yy etc: 03.03.25")
+        users_states[call.message.chat.id] = 'waiting_for_bar_chart_data'
+        dao.save_users_state(users_states)
+
     elif call.data == "fat" or call.data == "cholesterol" or call.data == "carbohydrate" or call.data == "protein" or call.data == "sodium" or call.data == "potassium":
         logger.info(f"[user: {call.message.chat.first_name!r} clicked: {call.data!r}]")
         if call.message.chat.id not in users_selections:
             users_selections[call.message.chat.id] = []
+
         # toggle the selection for the clicked category
         if call.data not in users_selections[call.message.chat.id]:
             users_selections[call.message.chat.id].append(call.data)
@@ -124,7 +153,6 @@ def handle_query(call: types.CallbackQuery):
             users_selections[call.message.chat.id].remove(call.data)
 
         markup=update_buttons(call)
-
 
         bot.edit_message_text(
             chat_id=call.message.chat.id,
@@ -183,7 +211,6 @@ def generate_report_by_date(message: telebot.types.Message):
         bot.reply_to(message, "the given date is in a wrong format, please enter in this format : dd.mm.yy")
 
 
-
 @bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id] and users_states[message.chat.id] == "waiting_for_date_for_category")
 def generate_report_by_category(message: telebot.types.Message):
     try:
@@ -206,10 +233,24 @@ def generate_report_by_category(message: telebot.types.Message):
         bot.reply_to(message, "the given date is in a wrong format, please enter in this format : dd.mm.yy")
 
 
+@bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id]
+                                          and users_states[message.chat.id] == "waiting_for_pie_chart_data")
+def generate_pie_chart(message: telebot.types.Message):
+    buffer = Graph_Controller().pie_chart(message.from_user.id, message, [""])
+    bot.send_photo(message.chat.id, buffer)
+    buffer.close()
+    users_states[message.chat.id] = None
+
+
+@bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id]
+                                          and users_states[message.chat.id] == "waiting_for_bar_chart_data")
+def generate_bar_chart(message: telebot.types.Message):
+    buffer = Graph_Controller().bar_chart(message.from_user.id, message, [""])
+    bot.send_photo(message.chat.id, buffer)
+    buffer.close()
+    users_states[message.chat.id] = None
 
 
 logger.info("> Starting bot")
 bot.infinity_polling()
 logger.info("< terminating bot!")
-
-
