@@ -211,12 +211,14 @@ def get_food_info(message: telebot.types.Message):
         else:
             nutrition_message = (
                 "🍽 Nutritional Information:\n"
+                f"🔥 Calories: {nutrition_info['calories']} kcal\n"
                 f"🍗 Protein: {nutrition_info['protein']}\n"
                 f"🥔 Carbohydrates: {nutrition_info['total_carbohydrate']}\n"
                 f"🥑 Total Fat: {nutrition_info['total_fat']}\n"
                 f"🧂 Sodium: {nutrition_info['sodium']}\n"
                 f"🍌 Potassium: {nutrition_info['potassium']}\n"
                 f"🫀 Cholesterol: {nutrition_info['cholesterol']}\n"
+                f"🍬 Sugars: {nutrition_info['sugars']}\n"
             )
             bot.send_message(message.chat.id, f"{message.text} have:\n {nutrition_message}")
             users_states[message.chat.id] = None
@@ -226,21 +228,6 @@ def get_food_info(message: telebot.types.Message):
         show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
 
 
-
-@bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id] == 'show_food_per_date')
-def fetch_eaten_food_info(message):
-    """Step 2: Retrieve food information from the database."""
-    date = message.text
-
-    food_info = dao.get_foods_by_user_and_date(message.chat.id, date)
-
-    if food_info:
-        response = f"🍏 Food: {food_info['name']}\n📌 Category: {food_info['category']}\n🔥 Calories: {food_info['calories']} kcal"
-    else:
-        response = "⚠️ Food not found in the database."
-
-    bot.reply_to(message, response)
-    users_states.pop(message.chat.id, None)
 
 
 @bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id] == 'waiting_for_date')
