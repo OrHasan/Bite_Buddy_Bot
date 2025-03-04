@@ -37,13 +37,14 @@ class Report_Controller:
 
             return report
 
-    def generate_report_by_category(self, message, user_history_db, nutrition):
+    def generate_report_by_category(self, message, user_history_db, nutritions):
         logger.info(f"[generating category report for user: {message.chat.first_name!r}.]")
         last_date = ""
         report = ""
         date = message.text
-        if nutrition=="fat" or nutrition=="carbohydrate":
-            nutrition="total_"+nutrition
+        for i in range(len(nutritions)):
+            if nutritions[i]=="fat" or nutritions[i]=="carbohydrate":
+                nutritions[i]="total_"+nutritions[i]
         # ToDo: Return the MongoDB find() function
         # for food in user_history_db.find():
         for food in user_history_db:
@@ -57,7 +58,7 @@ class Report_Controller:
                 report += f"{food['name']}:"
 
                 for data_name, data_info in food.items():
-                    if data_name == "name" or data_name == "date" or data_name == "user_id" or data_name == "_id" or data_name != nutrition:
+                    if data_name == "name" or data_name == "date" or data_name == "user_id" or data_name == "_id" or data_name not in nutritions:
                         continue
                     data_name=data_name.split('_')[-1] # this is to treat the total_Fat and total_carbs case
                     report += f"\n{data_name}: {data_info}"
