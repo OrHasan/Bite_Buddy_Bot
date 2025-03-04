@@ -31,6 +31,10 @@ class DaoController:
         logger.info(f"[adding food for the user: {user_id!r} , result={result.acknowledged} .]")
         return result.inserted_id
 
+    def get_food(self, name):
+        """Retrieves a food item by name."""
+        return self.collection.find_one({"name": name})
+
     def get_user_states(self):
         self.collection = self.db["users_states"]
         user_states_cursor = self.collection.find()
