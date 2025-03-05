@@ -64,13 +64,13 @@ class GeminiController:
             details['sugars'] += float(food['sugars'].split()[0])
 
         details['calories'] = str(details['calories'])
-        details['total_fat'] = str(details['total_fat'] + ' gr')
-        details['cholesterol'] = str(details['cholesterol'] + ' mg')
-        details['sodium'] = str(details['sodium'] + ' mg')
-        details['total_carbohydrate'] = str(details['total_carbohydrate'] + ' gr')
-        details['potassium'] = str(details['potassium'] + ' mg')
-        details['protein'] = str(details['protein'] + ' gr')
-        details['sugars'] = str(details['sugars'] + ' gr')
+        details['total_fat'] = str(details['total_fat']) + ' gr'
+        details['cholesterol'] = str(details['cholesterol']) + ' mg'
+        details['sodium'] = str(details['sodium']) + ' mg'
+        details['total_carbohydrate'] = str(details['total_carbohydrate']) + ' gr'
+        details['potassium'] = str(details['potassium']) + ' mg'
+        details['protein'] = str(details['protein']) + ' gr'
+        details['sugars'] = str(details['sugars']) + ' gr'
 
         for key, value in details.items():
             history += key + ': ' + value + '\n'
