@@ -29,10 +29,15 @@ View Food's nutrition values: Users can view nutrition values of a specefic food
 
 ## Usage
 **Start the bot**: Send /start to the bot to see the main menu.  
+
 **Add Food**: Select "Add Food" from the menu and enter the food item you have eaten.  
+
 **Generate Report**: Select "Generate Report" and choose the type of report you want to generate. 
+
 **Generate Chart**: Select "Generate Chart" and choose the type of chart you want to generate. 
+
 **Get Food Info**: Select "Get Food Info" and enter a food that you want to view its nutrition values.
+
 **Ask AI**: Select "Ask AI" to get motivations or advices from an AI.
 
 
