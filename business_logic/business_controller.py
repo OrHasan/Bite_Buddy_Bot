@@ -317,9 +317,15 @@ def generate_pie_chart(message: telebot.types.Message):
         logger.info(f"[user: {message.chat.first_name!r}] gave the date: {message.text!r} for the pie chart")
         buffer = Graph_Controller().pie_chart(message.from_user.id, message)
 
-        bot.send_photo(message.chat.id, buffer)
-        logger.info(f"[Pie chart created successfully for user: {message.chat.first_name!r}]")
-        buffer.close()
+        if not buffer:
+            bot.send_message(message.chat.id, "there is no data for the given date.")
+            logger.info(f"[there is no data for the given date,"
+                        f" pie chart not created for user: {message.chat.first_name!r}]")
+        else:
+            bot.send_photo(message.chat.id, buffer)
+            logger.info(f"[Pie chart created successfully for user: {message.chat.first_name!r}]")
+            buffer.close()
+
         users_states[message.chat.id] = None
         show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
 
@@ -336,9 +342,15 @@ def generate_bar_chart(message: telebot.types.Message):
         logger.info(f"[user: {message.chat.first_name!r}] gave the date: {message.text!r} for the bar chart")
         buffer = Graph_Controller().bar_chart(message.from_user.id, message)
 
-        bot.send_photo(message.chat.id, buffer)
-        logger.info(f"[Bar chart created successfully for user: {message.chat.first_name!r}]")
-        buffer.close()
+        if not buffer:
+            bot.send_message(message.chat.id, "there is no data for the given date.")
+            logger.info(f"[there is no data for the given date,"
+                        f" bar chart not created for user: {message.chat.first_name!r}]")
+        else:
+            bot.send_photo(message.chat.id, buffer)
+            logger.info(f"[Bar chart created successfully for user: {message.chat.first_name!r}]")
+            buffer.close()
+
         users_states[message.chat.id] = None
         show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
 

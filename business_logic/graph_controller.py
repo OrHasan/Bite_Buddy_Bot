@@ -6,8 +6,11 @@ from DAO.dao_controller import DaoController as Dao
 
 
 class Graph_Controller():
-    def pie_chart(self, user_id:int, date:telebot.types.Message) -> io.BytesIO:
+    def pie_chart(self, user_id:int, date:telebot.types.Message) -> io.BytesIO | None:
         data = Dao().get_foods_by_user_and_date(user_id, date)
+        if not data:
+            return None
+
         labels = ['total_fat', 'cholesterol', 'sodium', 'total_carbohydrate', 'potassium', 'protein', 'sugars']
         details = {}
 
@@ -46,8 +49,11 @@ class Graph_Controller():
         plt.close(fig)
         return buf
 
-    def bar_chart(self, user_id:int, date:telebot.types.Message) -> io.BytesIO:
+    def bar_chart(self, user_id:int, date:telebot.types.Message) -> io.BytesIO | None:
         data = Dao().get_foods_by_user_and_date(user_id, date)
+        if not data:
+            return None
+
         chart_data = {}
         for food in data:
             if food['name'] not in chart_data:
