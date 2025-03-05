@@ -24,13 +24,16 @@ View Eaten Food: Users can view the food items they have eaten on a specific dat
 **Python**: The primary programming language used for the bot.  
 **pyTelegramBotAPI**: A Python wrapper for the Telegram Bot API.  
 **MongoDB**: Used for storing user data and food history.  
-**Google Search Results API**: Used for fetching food information.  
+**Nutritionix API**: Used for fetching food information.  
 
 ## Usage
 **Start the bot**: Send /start to the bot to see the main menu.  
-**Add Food**: Select "Add_Food" from the menu and enter the food item you have eaten.  
-**Generate Report**: Select "Generate_Report" and choose the type of report you want to generate.  
-**View Eaten Food**: Select "Show_eaten_food" and enter the date to view the food items eaten on that date.
+**Add Food**: Select "Add Food" from the menu and enter the food item you have eaten.  
+**Generate Report**: Select "Generate Report" and choose the type of report you want to generate. 
+**Generate Chart**: Select "Generate Chart" and choose the type of chart you want to generate. 
+**Get Food Info**: Select "Get Food Info" and enter a food that you want to view its nutrition values.
+**Ask AI**: Select "Ask AI" to get motivations or advices from an AI.
+
 
 ## Instructions for Developers 
 ### Prerequisites
@@ -38,15 +41,20 @@ View Eaten Food: Users can view the food items they have eaten on a specific dat
 - (uv van install python for you)
 - MongoDB (PyMongo)
 - Telegram API (pyTelegramBotAPI)
-- Google Search Results API (google-search-results)
+- Matplotlib
+- Google-genai (Gemeni)
 
 ### Setup
 - git clone this repository 
 - cd into the project directory
 - Get an API Token for a bot via the [BotFather](https://telegram.me/BotFather)
-- Create a `bot_secretes.py` file with your bot token:
+- Sign Up to Nutritionx https://developer.nutritionix.com/signup to recieve your nutritionx app ID and nutritionx API token.
+- Create a `bot_secretes.py` file with your bot token and nutritionx tokens:
+- 
 
       BOT_TOKEN = 'xxxxxxx'
+      nutrition_x_api = 'xxxxxxx'
+      nutrition_x_app_id = 'xxxxxxx'
   
 ### Running the bot        
 - Run the bot (This will also install Python 3.13 and all dependencies):
