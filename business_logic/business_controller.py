@@ -312,38 +312,68 @@ def generate_report_by_category(message: telebot.types.Message):
 @bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id]
                                           and users_states[message.chat.id] == "waiting_for_pie_chart_data")
 def generate_pie_chart(message: telebot.types.Message):
-    logger.info(f"[user: {message.chat.first_name!r}] gave the date: {message.text!r} for the pie chart")
-    buffer = Graph_Controller().pie_chart(message.from_user.id, message)
+    try:
+        datetime.strptime(message.text, "%d.%m.%y") #checks if the date is in the correct format
+        logger.info(f"[user: {message.chat.first_name!r}] gave the date: {message.text!r} for the pie chart")
+        buffer = Graph_Controller().pie_chart(message.from_user.id, message)
 
-    bot.send_photo(message.chat.id, buffer)
-    logger.info(f"[Pie chart created successfully for user: {message.chat.first_name!r}]")
-    buffer.close()
-    users_states[message.chat.id] = None
-    show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
+        if not buffer:
+            bot.send_message(message.chat.id, "there is no data for the given date.")
+            logger.info(f"[there is no data for the given date,"
+                        f" pie chart not created for user: {message.chat.first_name!r}]")
+        else:
+            bot.send_photo(message.chat.id, buffer)
+            logger.info(f"[Pie chart created successfully for user: {message.chat.first_name!r}]")
+            buffer.close()
+
+        users_states[message.chat.id] = None
+        show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
+
+    except ValueError:
+        logger.warning(f"[user: {message.chat.first_name!r} entered wrong date format]")
+        bot.reply_to(message, "the given date is in a wrong format, please enter in this format : dd.mm.yy")
 
 
 @bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id]
                                           and users_states[message.chat.id] == "waiting_for_bar_chart_data")
 def generate_bar_chart(message: telebot.types.Message):
-    logger.info(f"[user: {message.chat.first_name!r}] gave the date: {message.text!r} for the bar chart")
-    buffer = Graph_Controller().bar_chart(message.from_user.id, message)
+    try:
+        datetime.strptime(message.text, "%d.%m.%y")  # checks if the date is in the correct format
+        logger.info(f"[user: {message.chat.first_name!r}] gave the date: {message.text!r} for the bar chart")
+        buffer = Graph_Controller().bar_chart(message.from_user.id, message)
 
-    bot.send_photo(message.chat.id, buffer)
-    logger.info(f"[Bar chart created successfully for user: {message.chat.first_name!r}]")
-    buffer.close()
-    users_states[message.chat.id] = None
-    show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
+        if not buffer:
+            bot.send_message(message.chat.id, "there is no data for the given date.")
+            logger.info(f"[there is no data for the given date,"
+                        f" bar chart not created for user: {message.chat.first_name!r}]")
+        else:
+            bot.send_photo(message.chat.id, buffer)
+            logger.info(f"[Bar chart created successfully for user: {message.chat.first_name!r}]")
+            buffer.close()
+
+        users_states[message.chat.id] = None
+        show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
+
+    except ValueError:
+        logger.warning(f"[user: {message.chat.first_name!r} entered wrong date format]")
+        bot.reply_to(message, "the given date is in a wrong format, please enter in this format : dd.mm.yy")
 
 
 @bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id]
                                           and users_states[message.chat.id] == "waiting_for_date_for_advice")
 def generate_ai_answer(message: telebot.types.Message):
-    logger.info(f"[user: {message.chat.first_name!r}] gave the date: {message.text!r} for an AI advice")
-    advice = GeminiController().user_question(message)
-    bot.send_message(message.chat.id, advice)
-    logger.info(f"[user: {message.chat.first_name!r}] got the following advice: {advice!r}")
-    users_states[message.chat.id] = None
-    show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
+    try:
+        datetime.strptime(message.text, "%d.%m.%y")  # checks if the date is in the correct format
+        logger.info(f"[user: {message.chat.first_name!r}] gave the date: {message.text!r} for an AI advice")
+        advice = GeminiController().user_question(message)
+        bot.send_message(message.chat.id, advice)
+        logger.info(f"[user: {message.chat.first_name!r}] got the following advice: {advice!r}")
+        users_states[message.chat.id] = None
+        show_menu(message.chat.id, message.chat.first_name, "Choose an option below:")
+
+    except ValueError:
+        logger.warning(f"[user: {message.chat.first_name!r} entered wrong date format]")
+        bot.reply_to(message, "the given date is in a wrong format, please enter in this format : dd.mm.yy")
 
 
 @bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id]
