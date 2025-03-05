@@ -365,7 +365,9 @@ def generate_ai_advice(message: telebot.types.Message):
     try:
         datetime.strptime(message.text, "%d.%m.%y")  # checks if the date is in the correct format
         logger.info(f"[user: {message.chat.first_name!r}] gave the date: {message.text!r} for an AI advice")
+
         advice = GeminiController().improvement_advice(message.from_user.id, message)
+
         bot.send_message(message.chat.id, advice)
         logger.info(f"[user: {message.chat.first_name!r}] got the following advice: {advice!r}")
         users_states[message.chat.id] = None
