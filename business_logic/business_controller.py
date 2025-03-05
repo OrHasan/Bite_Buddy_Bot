@@ -365,7 +365,7 @@ def generate_ai_advice(message: telebot.types.Message):
     try:
         datetime.strptime(message.text, "%d.%m.%y")  # checks if the date is in the correct format
         logger.info(f"[user: {message.chat.first_name!r}] gave the date: {message.text!r} for an AI advice")
-        advice = GeminiController().user_question(message)
+        advice = GeminiController().improvement_advice(message.from_user.id, message)
         bot.send_message(message.chat.id, advice)
         logger.info(f"[user: {message.chat.first_name!r}] got the following advice: {advice!r}")
         users_states[message.chat.id] = None
@@ -380,7 +380,7 @@ def generate_ai_advice(message: telebot.types.Message):
                                           and users_states[message.chat.id] == "waiting_for_user_question")
 def generate_ai_answer(message: telebot.types.Message):
     logger.info(f"[user: {message.chat.first_name!r}] gave the following question for the ai: {message.text!r}")
-    answer = GeminiController().user_question(message.text)
+    answer = GeminiController().user_question(message)
     bot.send_message(message.chat.id, answer)
     logger.info(f"[user: {message.chat.first_name!r}] got the following AI answer: {answer!r}")
     users_states[message.chat.id] = None
