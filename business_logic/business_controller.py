@@ -77,7 +77,7 @@ def show_menu(user_id,username,message):
     markup = types.InlineKeyboardMarkup(row_width=2)  # row_width => how many buttons per row
     button1 = types.InlineKeyboardButton("Add Food", callback_data="add_food")
     button2 = types.InlineKeyboardButton("Generate Report", callback_data="generate_report")
-    button3 = types.InlineKeyboardButton("Chart Report", callback_data="chart_report")
+    button3 = types.InlineKeyboardButton("Generate Chart", callback_data="chart_report")
     button4 = types.InlineKeyboardButton("Get Food Info", callback_data="get_food_info")
     button5 = types.InlineKeyboardButton("Ask AI", callback_data="ai_advisor")
     markup.add(button1, button2, button3, button4, button5)
@@ -312,9 +312,8 @@ def generate_report_by_category(message: telebot.types.Message):
 @bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id]
                                           and users_states[message.chat.id] == "waiting_for_pie_chart_data")
 def generate_pie_chart(message: telebot.types.Message):
-
+    logger.info(f"[user: {message.chat.first_name!r}] gave the date: {message.text!r} for the pie chart")
     buffer = Graph_Controller().pie_chart(message.from_user.id, message)
-  logger.info(f"[user: {message.chat.first_name!r}] gave the date: {message.text!r} for the pie chart")
 
     bot.send_photo(message.chat.id, buffer)
     logger.info(f"[Pie chart created successfully for user: {message.chat.first_name!r}]")
@@ -326,9 +325,8 @@ def generate_pie_chart(message: telebot.types.Message):
 @bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id]
                                           and users_states[message.chat.id] == "waiting_for_bar_chart_data")
 def generate_bar_chart(message: telebot.types.Message):
-
+    logger.info(f"[user: {message.chat.first_name!r}] gave the date: {message.text!r} for the bar chart")
     buffer = Graph_Controller().bar_chart(message.from_user.id, message)
-  logger.info(f"[user: {message.chat.first_name!r}] gave the date: {message.text!r} for the bar chart")
 
     bot.send_photo(message.chat.id, buffer)
     logger.info(f"[Bar chart created successfully for user: {message.chat.first_name!r}]")
