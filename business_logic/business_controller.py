@@ -312,8 +312,10 @@ def generate_report_by_category(message: telebot.types.Message):
 @bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id]
                                           and users_states[message.chat.id] == "waiting_for_pie_chart_data")
 def generate_pie_chart(message: telebot.types.Message):
-    logger.info(f"[user: {message.chat.first_name!r}] gave the date: {message.text!r} for the pie chart")
-    buffer = Graph_Controller().pie_chart(message.from_user.id, message, [""])
+
+    buffer = Graph_Controller().pie_chart(message.from_user.id, message)
+  logger.info(f"[user: {message.chat.first_name!r}] gave the date: {message.text!r} for the pie chart")
+
     bot.send_photo(message.chat.id, buffer)
     logger.info(f"[Pie chart created successfully for user: {message.chat.first_name!r}]")
     buffer.close()
@@ -324,8 +326,10 @@ def generate_pie_chart(message: telebot.types.Message):
 @bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id]
                                           and users_states[message.chat.id] == "waiting_for_bar_chart_data")
 def generate_bar_chart(message: telebot.types.Message):
-    logger.info(f"[user: {message.chat.first_name!r}] gave the date: {message.text!r} for the bar chart")
-    buffer = Graph_Controller().bar_chart(message.from_user.id, message, [""])
+
+    buffer = Graph_Controller().bar_chart(message.from_user.id, message)
+  logger.info(f"[user: {message.chat.first_name!r}] gave the date: {message.text!r} for the bar chart")
+
     bot.send_photo(message.chat.id, buffer)
     logger.info(f"[Bar chart created successfully for user: {message.chat.first_name!r}]")
     buffer.close()
