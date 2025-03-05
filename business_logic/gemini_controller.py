@@ -84,12 +84,12 @@ class GeminiController:
         )
         return response.text
 
-    def user_question(self, question:str):
+    def user_question(self, question:telebot.types.Message) -> str:
         response = self.client.models.generate_content(
             model="gemini-2.0-flash",
             config=types.GenerateContentConfig(
                 system_instruction=self.sys_instruct),
             contents=["Answer the following user question (please make sure the user asks only relevant questions"
-                      "to this bot topic):\n" + question]
+                      "to this bot topic):\n" + question.text]
         )
         return response.text

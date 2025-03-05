@@ -361,7 +361,7 @@ def generate_bar_chart(message: telebot.types.Message):
 
 @bot.message_handler(func=lambda message: message.chat.id in users_states and users_states[message.chat.id]
                                           and users_states[message.chat.id] == "waiting_for_date_for_advice")
-def generate_ai_answer(message: telebot.types.Message):
+def generate_ai_advice(message: telebot.types.Message):
     try:
         datetime.strptime(message.text, "%d.%m.%y")  # checks if the date is in the correct format
         logger.info(f"[user: {message.chat.first_name!r}] gave the date: {message.text!r} for an AI advice")
