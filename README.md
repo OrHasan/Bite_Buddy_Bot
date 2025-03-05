@@ -7,7 +7,7 @@
 
 ## About this bot
 
-Bite Buddy Bot (BBB) is a nutrition tracker Telegram bot designed to help users keep track of their daily food intake and generate reports based on their eating habits. The bot allows users to add food items, view their eating history, and generate reports by date or category.
+Bite Buddy Bot (BBB) is a nutrition tracker Telegram bot designed to help users keep track of their daily food intake and generate reports and graphs based on their eating habits. The bot allows users to add food items, view their eating history, and generate graphs and reports by date or category.
 
 https://web.telegram.org/k/#@Bite_Buddy_Bot
 
@@ -17,7 +17,8 @@ https://web.telegram.org/k/#@Bite_Buddy_Bot
 
 Add Food: Users can add food items they have eaten, including details such as calories, healthiness, and amount.  
 Generate Reports: Users can generate reports based on specific dates or categories to analyze their eating habits.  
-View Eaten Food: Users can view the food items they have eaten on a specific date.  
+Generate charts: Users can generate charts based on specific dates to view the calories and percentages of nutrition values.  
+View Food's nutrition values: Users can view nutrition values of a specefic food.
 
 ## Technologies Used
 
