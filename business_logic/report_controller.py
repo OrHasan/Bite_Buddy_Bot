@@ -6,15 +6,14 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-class Report_Controller:
+class ReportController:
     def generate_report_by_date(self, message,user_history_db):
         # logger.info(f"generate report for #{message.chat.id}")
         logger.info(f"[generating daily report for user: {message.chat.first_name!r}.]")
         date=message.text
-
-
         last_date = ""
         report = ""
+
         # ToDo: Return the MongoDB find() function
         # for food in user_history_db.find():
         for food in user_history_db:
@@ -58,7 +57,8 @@ class Report_Controller:
                 report += f"{food['name']}:"
 
                 for data_name, data_info in food.items():
-                    if data_name == "name" or data_name == "date" or data_name == "user_id" or data_name == "_id" or data_name not in nutritions:
+                    if (data_name == "name" or data_name == "date" or data_name == "user_id"
+                            or data_name == "_id" or data_name not in nutritions):
                         continue
                     data_name=data_name.split('_')[-1] # this is to treat the total_Fat and total_carbs case
                     report += f"\n{data_name}: {data_info}"

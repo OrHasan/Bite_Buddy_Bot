@@ -7,7 +7,7 @@ dependencies = [
     "matplotlib>=3.10.1",
     "pymongo>=4.11.1",
     "pytelegrambotapi>=4.26.0",
-    "serpapi>=0.1.5",
+#    "serpapi>=0.1.5",
 ]
 
 [dependency-groups]

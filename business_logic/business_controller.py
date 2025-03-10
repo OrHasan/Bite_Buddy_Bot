@@ -6,9 +6,9 @@ from telebot import types
 
 import bot_secrets
 from DAO.dao_controller import DaoController
-from business_logic.Report_Controller import Report_Controller
-from business_logic.api_manager import API_Manager
-from business_logic.graph_controller import Graph_Controller
+from business_logic.report_controller import ReportController
+from business_logic.api_manager import APIManager
+from business_logic.graph_controller import GraphController
 from business_logic.gemini_controller import GeminiController
 
 
@@ -18,12 +18,12 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-bot = telebot.TeleBot(bot_secrets.TOKEN)
-api_manager=API_Manager()
+bot = telebot.TeleBot(bot_secrets.BOT_TOKEN)
+api_manager=APIManager()
 dao = DaoController()
 users_states = {}
 users_selections = {}
-report_controller=Report_Controller()
+report_controller=ReportController()
 
 
 def show_reports_categroy(chat_id,username, message):
@@ -81,8 +81,7 @@ def show_menu(user_id,username,message):
     button4 = types.InlineKeyboardButton("Get Food Info", callback_data="get_food_info")
     button5 = types.InlineKeyboardButton("Ask AI", callback_data="ai_advisor")
     markup.add(button1, button2, button3, button4, button5)
-    bot.send_message(user_id, message,
-                     reply_markup=markup)
+    bot.send_message(user_id, message, reply_markup=markup)
 
 
 @bot.message_handler(commands=["start"])
@@ -96,25 +95,31 @@ def send_welcome(message: telebot.types.Message):
 
 def update_buttons(call):
     markup = types.InlineKeyboardMarkup(row_width=3)
+    button1 = types.InlineKeyboardButton(
+        f"fat {'✅' if 'fat' in users_selections[call.message.chat.id] else '❌'}",
+        callback_data="fat")
 
-    button1 = types.InlineKeyboardButton(f"fat {'✅' if 'fat' in users_selections[call.message.chat.id] else '❌'}",
-                                         callback_data="fat")
     button2 = types.InlineKeyboardButton(
         f"cholesterol {'✅' if 'cholesterol' in users_selections[call.message.chat.id] else '❌'}",
         callback_data="cholesterol")
+
     button3 = types.InlineKeyboardButton(
         f"carbohydrate {'✅' if 'carbohydrate' in users_selections[call.message.chat.id] else '❌'}",
         callback_data="carbohydrate")
+
     button4 = types.InlineKeyboardButton(
-        f"protein {'✅' if 'protein' in users_selections[call.message.chat.id] else '❌'}", callback_data="protein")
+        f"protein {'✅' if 'protein' in users_selections[call.message.chat.id] else '❌'}",
+        callback_data="protein")
+
     button5 = types.InlineKeyboardButton(
-        f"sodium {'✅' if 'sodium' in users_selections[call.message.chat.id] else '❌'}", callback_data="sodium")
+        f"sodium {'✅' if 'sodium' in users_selections[call.message.chat.id] else '❌'}",
+        callback_data="sodium")
+
     button6 = types.InlineKeyboardButton(
         f"potassium {'✅' if 'potassium' in users_selections[call.message.chat.id] else '❌'}",
         callback_data="potassium")
 
     done_button = types.InlineKeyboardButton("Done", callback_data="done_selecting_nutritions_for_report")
-
     markup.add(button1, button2, button3, button4, button5, button6, done_button)
     return markup
 
@@ -315,7 +320,7 @@ def generate_pie_chart(message: telebot.types.Message):
     try:
         datetime.strptime(message.text, "%d.%m.%y") #checks if the date is in the correct format
         logger.info(f"[user: {message.chat.first_name!r}] gave the date: {message.text!r} for the pie chart")
-        buffer = Graph_Controller().pie_chart(message.from_user.id, message)
+        buffer = GraphController().pie_chart(message.from_user.id, message)
 
         if not buffer:
             bot.send_message(message.chat.id, "there is no data for the given date.")
@@ -340,7 +345,7 @@ def generate_bar_chart(message: telebot.types.Message):
     try:
         datetime.strptime(message.text, "%d.%m.%y")  # checks if the date is in the correct format
         logger.info(f"[user: {message.chat.first_name!r}] gave the date: {message.text!r} for the bar chart")
-        buffer = Graph_Controller().bar_chart(message.from_user.id, message)
+        buffer = GraphController().bar_chart(message.from_user.id, message)
 
         if not buffer:
             bot.send_message(message.chat.id, "there is no data for the given date.")

@@ -1,18 +1,19 @@
 import logging
-
 from pymongo import MongoClient
 from datetime import datetime
+
+
 logging.basicConfig(
     format="[%(levelname)s %(asctime)s %(module)s:%(lineno)d] %(message)s",
     level=logging.INFO,
 )
 logger = logging.getLogger(__name__)
-class DaoController:
 
+
+class DaoController:
     def __init__(self, db_name="food_info_db", uri="mongodb://localhost:27017/"):
         self.client = MongoClient(uri)
         self.db = self.client[db_name]
-
 
     def add_food(self,food_name, food_item, user_id, date):
         """Adds a new food item to the database."""
@@ -59,7 +60,8 @@ class DaoController:
     def get_foods_by_user_and_date(self, user_id, message):
         """Retrieves all foods eaten by a specific user on a specific date."""
         self.collection = self.db["foods"]
-        logger.info(f"[extracting data from DB for the user: {user_id!r}, inside the function get_foods_by_user_and_date.]")
+        logger.info(f"[extracting data from DB for the user: {user_id!r},"
+                    f" inside the function get_foods_by_user_and_date.]")
         date = datetime.strptime(message.text, "%d.%m.%y")
         start_of_day = datetime(date.year, date.month, date.day)  # start of the given day
         end_of_day = datetime(date.year, date.month, date.day, 23, 59, 59, 999999)  # end of the given day
@@ -70,4 +72,3 @@ class DaoController:
             "date": {"$gte": start_of_day, "$lte": end_of_day}
         })
         return list(result)
-

@@ -2,6 +2,9 @@ from pprint import pprint
 import requests
 import logging
 
+from bot_secrets import nutrition_x_api,nutrition_x_app_id
+
+
 logging.basicConfig(
     format="[%(levelname)s %(asctime)s %(module)s:%(lineno)d] %(message)s",
     level=logging.INFO,
@@ -9,12 +12,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-from bot_secrets import nutrition_x_api,nutrition_x_app_id
-
-
-class API_Manager:
+class APIManager:
     def get_info_by_api(self,food_name):
-        API_URL = 'https://trackapi.nutritionix.com/v2/natural/nutrients'
+        api_url = 'https://trackapi.nutritionix.com/v2/natural/nutrients'
         headers = {
             'x-app-id': nutrition_x_app_id,
             'x-app-key': nutrition_x_api,
@@ -25,7 +25,7 @@ class API_Manager:
             "query": food_name
         }
 
-        response = requests.post(API_URL, headers=headers, json=data)
+        response = requests.post(api_url, headers=headers, json=data)
         nutritions_dict = {}
 
         if response.status_code == 200:
@@ -40,9 +40,6 @@ class API_Manager:
             nutritions_dict['protein'] = str(nutrition_data['nf_protein'])+' gr' if nutrition_data['nf_protein'] is not None else '0 gr'
             nutritions_dict['sugars'] = str(nutrition_data['nf_sugars']) + ' gr' if nutrition_data['nf_sugars'] is not None else '0 gr'
 
-
-
-
         return nutritions_dict
 
         # logger.info(f"[getting info using the api.]")
@@ -56,4 +53,3 @@ class API_Manager:
         # results = search.get_dict()
         # nutrition_information = results["knowledge_graph"]['list']
         # return nutrition_information
-

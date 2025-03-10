@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from DAO.dao_controller import DaoController as Dao
 
 
-class Graph_Controller():
+class GraphController:
     def pie_chart(self, user_id:int, date:telebot.types.Message) -> io.BytesIO | None:
         data = Dao().get_foods_by_user_and_date(user_id, date)
         if not data:
